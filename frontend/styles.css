@@ -1,8 +1,24 @@
 body{
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     margin: 40px;
 }
 
 h1{
-    color: #2c3e50;
+    color:#2c3e50;
+}
+
+form{
+    margin-bottom:20px;
+}
+
+input, select, button{
+    display:block;
+    margin:10px 0;
+    padding:8px;
+}
+
+button{
+    background:#3498db;
+    color:white;
+    border:none;
 }
