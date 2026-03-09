@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Student Study Task Planner</title>
     <link rel="stylesheet" href="styles.css">
@@ -9,7 +10,32 @@
 
 <h1>Student Study & Task Planner</h1>
 
-<p>Welcome to the academic task planner.</p>
+<h2>Add Academic Task</h2>
+
+<form id="taskForm">
+
+<input type="text" id="title" placeholder="Task Title" required>
+
+<input type="text" id="course" placeholder="Course Name" required>
+
+<select id="taskType">
+<option>Assignment</option>
+<option>Exam</option>
+<option>Quiz</option>
+<option>Self Study</option>
+</select>
+
+<input type="date" id="deadline">
+
+<input type="number" id="studyHours" placeholder="Estimated Study Hours">
+
+<button type="submit">Add Task</button>
+
+</form>
+
+<h2>Task List</h2>
+
+<ul id="taskList"></ul>
 
 <script src="app.js"></script>
 
