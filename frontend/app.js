@@ -1,19 +1,19 @@
 const form = document.getElementById("taskForm");
 const taskList = document.getElementById("taskList");
 
-form.addEventListener("submit", function(event){
+form.addEventListener("submit", function(event) {
 
-event.preventDefault();
+    event.preventDefault();
 
-const title = document.getElementById("title").value;
-const course = document.getElementById("course").value;
+    const title = document.getElementById("title").value;
+    const course = document.getElementById("course").value;
 
-const li = document.createElement("li");
+    const li = document.createElement("li");
 
-li.textContent = title + " (" + course + ")";
+    li.textContent = title + " (" + course + ")";
 
-taskList.appendChild(li);
+    taskList.appendChild(li);
 
-form.reset();
+    form.reset();
 
 });
