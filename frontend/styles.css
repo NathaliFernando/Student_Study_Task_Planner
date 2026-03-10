@@ -1,24 +1,42 @@
-body{
-    font-family: Arial;
+body {
+    font-family: Arial, sans-serif;
     margin: 40px;
 }
 
-h1{
-    color:#2c3e50;
+h1 {
+    color: #333;
 }
 
-form{
-    margin-bottom:20px;
+form input, form select, form button {
+    display: block;
+    margin: 10px 0;
+    padding: 8px;
+    font-size: 14px;
 }
 
-input, select, button{
-    display:block;
-    margin:10px 0;
-    padding:8px;
+button {
+    cursor: pointer;
 }
 
-button{
-    background:#3498db;
-    color:white;
-    border:none;
+ul {
+    margin-top: 20px;
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+.high-priority {
+    color: red;
+    font-weight: bold;
+}
+
+.medium-priority {
+    color: orange;
+    font-weight: bold;
+}
+
+.low-priority {
+    color: green;
 }
