@@ -16,6 +16,7 @@ form input, form select, form button {
 
 button {
     cursor: pointer;
+    margin-left: 10px;
 }
 
 ul {

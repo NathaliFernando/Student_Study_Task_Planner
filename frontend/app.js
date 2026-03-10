@@ -45,7 +45,7 @@ form.addEventListener("submit", function(event) {
         " | Study Hours: " +
         studyHours +
         " | Priority: " +
-        priority;
+        priority + " ";
 
     if (priority === "HIGH") {
         li.classList.add("high-priority");
@@ -56,6 +56,16 @@ form.addEventListener("submit", function(event) {
     else {
         li.classList.add("low-priority");
     }
+
+    const deleteButton = document.createElement("button");
+
+    deleteButton.textContent = "Delete";
+
+    deleteButton.addEventListener("click", function() {
+        taskList.removeChild(li);
+    });
+
+    li.appendChild(deleteButton);
 
     taskList.appendChild(li);
 
