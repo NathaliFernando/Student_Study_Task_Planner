@@ -11,6 +11,25 @@ form.addEventListener("submit", function(event) {
     const deadline = document.getElementById("deadline").value;
     const studyHours = document.getElementById("studyHours").value;
 
+    let priority = "Low";
+
+    if (deadline) {
+
+        const today = new Date();
+        const dueDate = new Date(deadline);
+
+        const difference = dueDate - today;
+        const daysLeft = difference / (1000 * 60 * 60 * 24);
+
+        if (daysLeft <= 2) {
+            priority = "HIGH";
+        } else if (daysLeft <= 5) {
+            priority = "MEDIUM";
+        } else {
+            priority = "LOW";
+        }
+    }
+
     const li = document.createElement("li");
 
     li.textContent =
@@ -22,7 +41,9 @@ form.addEventListener("submit", function(event) {
         " | Deadline: " +
         deadline +
         " | Study Hours: " +
-        studyHours;
+        studyHours +
+        " | Priority: " +
+        priority;
 
     taskList.appendChild(li);
 
