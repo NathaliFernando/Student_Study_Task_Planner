@@ -57,14 +57,21 @@ form.addEventListener("submit", function(event) {
         li.classList.add("low-priority");
     }
 
-    const deleteButton = document.createElement("button");
+    const completeButton = document.createElement("button");
+    completeButton.textContent = "Complete";
 
+    completeButton.addEventListener("click", function() {
+        li.classList.toggle("completed-task");
+    });
+
+    const deleteButton = document.createElement("button");
     deleteButton.textContent = "Delete";
 
     deleteButton.addEventListener("click", function() {
         taskList.removeChild(li);
     });
 
+    li.appendChild(completeButton);
     li.appendChild(deleteButton);
 
     taskList.appendChild(li);
