@@ -1,6 +1,8 @@
 const form = document.getElementById("taskForm");
 const taskList = document.getElementById("taskList");
 
+let tasks = [];
+
 form.addEventListener("submit", function(event) {
 
     event.preventDefault();
@@ -32,50 +34,86 @@ form.addEventListener("submit", function(event) {
         }
     }
 
-    const li = document.createElement("li");
+    const task = {
+        title,
+        course,
+        taskType,
+        deadline,
+        studyHours,
+        priority
+    };
 
-    li.textContent =
-        title +
-        " | " +
-        course +
-        " | " +
-        taskType +
-        " | Deadline: " +
-        deadline +
-        " | Study Hours: " +
-        studyHours +
-        " | Priority: " +
-        priority + " ";
+    tasks.push(task);
 
-    if (priority === "HIGH") {
-        li.classList.add("high-priority");
-    } 
-    else if (priority === "MEDIUM") {
-        li.classList.add("medium-priority");
-    } 
-    else {
-        li.classList.add("low-priority");
-    }
-
-    const completeButton = document.createElement("button");
-    completeButton.textContent = "Complete";
-
-    completeButton.addEventListener("click", function() {
-        li.classList.toggle("completed-task");
-    });
-
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = "Delete";
-
-    deleteButton.addEventListener("click", function() {
-        taskList.removeChild(li);
-    });
-
-    li.appendChild(completeButton);
-    li.appendChild(deleteButton);
-
-    taskList.appendChild(li);
+    renderTasks();
 
     form.reset();
 
 });
+
+function renderTasks() {
+
+    taskList.innerHTML = "";
+
+    tasks.sort(function(a, b) {
+
+        const priorityOrder = {
+            HIGH: 1,
+            MEDIUM: 2,
+            LOW: 3
+        };
+
+        return priorityOrder[a.priority] - priorityOrder[b.priority];
+
+    });
+
+    tasks.forEach(function(task, index) {
+
+        const li = document.createElement("li");
+
+        li.textContent =
+            task.title +
+            " | " +
+            task.course +
+            " | " +
+            task.taskType +
+            " | Deadline: " +
+            task.deadline +
+            " | Study Hours: " +
+            task.studyHours +
+            " | Priority: " +
+            task.priority + " ";
+
+        if (task.priority === "HIGH") {
+            li.classList.add("high-priority");
+        } 
+        else if (task.priority === "MEDIUM") {
+            li.classList.add("medium-priority");
+        } 
+        else {
+            li.classList.add("low-priority");
+        }
+
+        const completeButton = document.createElement("button");
+        completeButton.textContent = "Complete";
+
+        completeButton.addEventListener("click", function() {
+            li.classList.toggle("completed-task");
+        });
+
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
+
+        deleteButton.addEventListener("click", function() {
+            tasks.splice(index, 1);
+            renderTasks();
+        });
+
+        li.appendChild(completeButton);
+        li.appendChild(deleteButton);
+
+        taskList.appendChild(li);
+
+    });
+
+}
