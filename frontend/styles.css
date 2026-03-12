@@ -1,48 +1,56 @@
-body {
+body{
     font-family: Arial, sans-serif;
-    margin: 40px;
+    background-color:#f4f6f8;
+    margin:40px;
 }
 
-h1 {
-    color: #333;
+h1{
+    text-align:center;
 }
 
-form input, form select, form button {
-    display: block;
-    margin: 10px 0;
-    padding: 8px;
-    font-size: 14px;
+form{
+    background:white;
+    padding:20px;
+    border-radius:8px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+    margin-bottom:20px;
 }
 
-button {
-    cursor: pointer;
-    margin-left: 10px;
+input,select,button{
+    padding:8px;
+    margin:5px;
 }
 
-ul {
-    margin-top: 20px;
-    padding-left: 20px;
+button{
+    cursor:pointer;
 }
 
-li {
-    margin-bottom: 10px;
+#taskList{
+    list-style:none;
+    padding:0;
 }
 
-.high-priority {
-    color: red;
-    font-weight: bold;
+#taskList li{
+    background:white;
+    margin-bottom:15px;
+    padding:15px;
+    border-radius:8px;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
 
-.medium-priority {
-    color: orange;
-    font-weight: bold;
+.high-priority{
+    border-left:6px solid red;
 }
 
-.low-priority {
-    color: green;
+.medium-priority{
+    border-left:6px solid orange;
 }
 
-.completed-task {
-    text-decoration: line-through;
-    color: gray;
+.low-priority{
+    border-left:6px solid green;
+}
+
+.completed-task{
+    text-decoration:line-through;
+    opacity:0.6;
 }
