@@ -54,3 +54,22 @@ button{
     text-decoration:line-through;
     opacity:0.6;
 }
+
+#warnings p{
+    font-weight:bold;
+}
+
+#progressContainer{
+    width:100%;
+    background:#ddd;
+    border-radius:20px;
+    overflow:hidden;
+    height:25px;
+}
+
+#progressBar{
+    height:100%;
+    width:0%;
+    background:#4CAF50;
+    transition:width 0.4s;
+}
