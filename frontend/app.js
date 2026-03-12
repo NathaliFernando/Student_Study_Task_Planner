@@ -6,6 +6,7 @@ let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let currentFilter = "ALL";
 
 renderTasks();
+updateStats();
 
 form.addEventListener("submit", function(event) {
 
@@ -52,6 +53,7 @@ form.addEventListener("submit", function(event) {
 
     saveTasks();
     renderTasks();
+    updateStats();
 
     form.reset();
 
@@ -100,7 +102,7 @@ function renderTasks() {
 
     });
 
-    filteredTasks.forEach(function(task, index) {
+    filteredTasks.forEach(function(task) {
 
         const li = document.createElement("li");
 
@@ -140,6 +142,7 @@ function renderTasks() {
 
             saveTasks();
             renderTasks();
+            updateStats();
 
         });
 
@@ -148,12 +151,13 @@ function renderTasks() {
 
         deleteButton.addEventListener("click", function() {
 
-            const realIndex = tasks.indexOf(task);
+            const index = tasks.indexOf(task);
 
-            tasks.splice(realIndex, 1);
+            tasks.splice(index, 1);
 
             saveTasks();
             renderTasks();
+            updateStats();
 
         });
 
@@ -163,5 +167,21 @@ function renderTasks() {
         taskList.appendChild(li);
 
     });
+
+}
+
+function updateStats() {
+
+    const total = tasks.length;
+
+    const completed = tasks.filter(task => task.completed).length;
+
+    const highPriority = tasks.filter(task => task.priority === "HIGH").length;
+
+    document.getElementById("totalTasks").textContent = total;
+
+    document.getElementById("completedTasks").textContent = completed;
+
+    document.getElementById("highPriorityTasks").textContent = highPriority;
 
 }
