@@ -7,6 +7,7 @@ let currentFilter = "ALL";
 
 renderTasks();
 updateStats();
+checkDeadlines();
 
 form.addEventListener("submit", function(event) {
 
@@ -54,6 +55,7 @@ form.addEventListener("submit", function(event) {
     saveTasks();
     renderTasks();
     updateStats();
+    checkDeadlines();
 
     form.reset();
 
@@ -143,6 +145,7 @@ function renderTasks() {
             saveTasks();
             renderTasks();
             updateStats();
+            checkDeadlines();
 
         });
 
@@ -158,6 +161,7 @@ function renderTasks() {
             saveTasks();
             renderTasks();
             updateStats();
+            checkDeadlines();
 
         });
 
@@ -173,15 +177,51 @@ function renderTasks() {
 function updateStats() {
 
     const total = tasks.length;
-
     const completed = tasks.filter(task => task.completed).length;
-
     const highPriority = tasks.filter(task => task.priority === "HIGH").length;
 
     document.getElementById("totalTasks").textContent = total;
-
     document.getElementById("completedTasks").textContent = completed;
-
     document.getElementById("highPriorityTasks").textContent = highPriority;
+
+}
+
+function checkDeadlines(){
+
+    const warningsDiv = document.getElementById("warnings");
+    warningsDiv.innerHTML = "";
+
+    const today = new Date();
+
+    tasks.forEach(function(task){
+
+        if(!task.deadline || task.completed) return;
+
+        const dueDate = new Date(task.deadline);
+
+        const difference = dueDate - today;
+        const daysLeft = Math.floor(difference / (1000*60*60*24));
+
+        const warning = document.createElement("p");
+
+        if(daysLeft < 0){
+
+            warning.textContent = "⚠ " + task.title + " is OVERDUE!";
+            warning.style.color = "red";
+
+            warningsDiv.appendChild(warning);
+
+        }
+
+        else if(daysLeft <= 2){
+
+            warning.textContent = "⚠ " + task.title + " is due in " + daysLeft + " day(s)";
+            warning.style.color = "orange";
+
+            warningsDiv.appendChild(warning);
+
+        }
+
+    });
 
 }
