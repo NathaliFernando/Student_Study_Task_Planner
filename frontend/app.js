@@ -1,7 +1,9 @@
 const form = document.getElementById("taskForm");
 const taskList = document.getElementById("taskList");
 
-let tasks = [];
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+renderTasks();
 
 form.addEventListener("submit", function(event) {
 
@@ -45,11 +47,16 @@ form.addEventListener("submit", function(event) {
 
     tasks.push(task);
 
+    saveTasks();
     renderTasks();
 
     form.reset();
 
 });
+
+function saveTasks() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
 
 function renderTasks() {
 
@@ -106,6 +113,7 @@ function renderTasks() {
 
         deleteButton.addEventListener("click", function() {
             tasks.splice(index, 1);
+            saveTasks();
             renderTasks();
         });
 
