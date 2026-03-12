@@ -1,6 +1,7 @@
 const form = document.getElementById("taskForm");
 const taskList = document.getElementById("taskList");
 const searchInput = document.getElementById("searchInput");
+const sortOption = document.getElementById("sortOption");
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
@@ -12,6 +13,7 @@ checkDeadlines();
 updateProgress();
 
 searchInput.addEventListener("input", renderTasks);
+sortOption.addEventListener("change", renderTasks);
 
 form.addEventListener("submit", function(event){
 
@@ -74,19 +76,19 @@ function renderTasks(){
 
 taskList.innerHTML="";
 
-let filteredTasks=tasks;
+let filteredTasks=[...tasks];
 
 if(currentFilter==="HIGH")
-filteredTasks=tasks.filter(t=>t.priority==="HIGH");
+filteredTasks=filteredTasks.filter(t=>t.priority==="HIGH");
 
 else if(currentFilter==="MEDIUM")
-filteredTasks=tasks.filter(t=>t.priority==="MEDIUM");
+filteredTasks=filteredTasks.filter(t=>t.priority==="MEDIUM");
 
 else if(currentFilter==="LOW")
-filteredTasks=tasks.filter(t=>t.priority==="LOW");
+filteredTasks=filteredTasks.filter(t=>t.priority==="LOW");
 
 else if(currentFilter==="COMPLETED")
-filteredTasks=tasks.filter(t=>t.completed===true);
+filteredTasks=filteredTasks.filter(t=>t.completed===true);
 
 const searchText=searchInput.value.toLowerCase();
 
@@ -94,6 +96,22 @@ filteredTasks=filteredTasks.filter(task =>
 task.title.toLowerCase().includes(searchText) ||
 task.course.toLowerCase().includes(searchText)
 );
+
+if(sortOption.value==="earliest"){
+
+filteredTasks.sort((a,b)=>{
+return new Date(a.deadline) - new Date(b.deadline);
+});
+
+}
+
+if(sortOption.value==="latest"){
+
+filteredTasks.sort((a,b)=>{
+return new Date(b.deadline) - new Date(a.deadline);
+});
+
+}
 
 filteredTasks.forEach(function(task){
 
