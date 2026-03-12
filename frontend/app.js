@@ -1,12 +1,12 @@
-const form=document.getElementById("taskForm");
-const taskList=document.getElementById("taskList");
-const searchInput=document.getElementById("searchInput");
-const sortOption=document.getElementById("sortOption");
-const themeToggle=document.getElementById("themeToggle");
+const form = document.getElementById("taskForm");
+const taskList = document.getElementById("taskList");
+const searchInput = document.getElementById("searchInput");
+const sortOption = document.getElementById("sortOption");
+const themeToggle = document.getElementById("themeToggle");
 
-let tasks=JSON.parse(localStorage.getItem("tasks"))||[];
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-let currentFilter="ALL";
+let currentFilter = "ALL";
 
 loadTheme();
 
@@ -15,45 +15,44 @@ updateStats();
 checkDeadlines();
 updateProgress();
 
-searchInput.addEventListener("input",renderTasks);
-sortOption.addEventListener("change",renderTasks);
+searchInput.addEventListener("input", renderTasks);
+sortOption.addEventListener("change", renderTasks);
+themeToggle.addEventListener("click", toggleTheme);
 
-themeToggle.addEventListener("click",toggleTheme);
-
-form.addEventListener("submit",function(event){
+form.addEventListener("submit", function(event) {
 
 event.preventDefault();
 
-const title=document.getElementById("title").value;
-const course=document.getElementById("course").value;
-const taskType=document.getElementById("taskType").value;
-const deadline=document.getElementById("deadline").value;
-const studyHours=document.getElementById("studyHours").value;
+const title = document.getElementById("title").value;
+const course = document.getElementById("course").value;
+const taskType = document.getElementById("taskType").value;
+const deadline = document.getElementById("deadline").value;
+const studyHours = document.getElementById("studyHours").value;
 
-let priority="LOW";
+let priority = "LOW";
 
-if(deadline){
+if (deadline) {
 
-const today=new Date();
-const dueDate=new Date(deadline);
+const today = new Date();
+const dueDate = new Date(deadline);
 
-const difference=dueDate-today;
-const daysLeft=difference/(1000*60*60*24);
+const difference = dueDate - today;
+const daysLeft = difference / (1000 * 60 * 60 * 24);
 
-if(daysLeft<=2) priority="HIGH";
-else if(daysLeft<=5) priority="MEDIUM";
-else priority="LOW";
+if (daysLeft <= 2) priority = "HIGH";
+else if (daysLeft <= 5) priority = "MEDIUM";
+else priority = "LOW";
 
 }
 
-const task={
+const task = {
 title,
 course,
 taskType,
 deadline,
 studyHours,
 priority,
-completed:false
+completed: false
 };
 
 tasks.push(task);
@@ -68,94 +67,104 @@ form.reset();
 
 });
 
-function saveTasks(){
-localStorage.setItem("tasks",JSON.stringify(tasks));
+function saveTasks() {
+localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-function toggleTheme(){
+function toggleTheme() {
 
 document.body.classList.toggle("dark-mode");
 
-if(document.body.classList.contains("dark-mode")){
-localStorage.setItem("theme","dark");
-}else{
-localStorage.setItem("theme","light");
+if (document.body.classList.contains("dark-mode")) {
+localStorage.setItem("theme", "dark");
+} else {
+localStorage.setItem("theme", "light");
 }
 
 }
 
-function loadTheme(){
+function loadTheme() {
 
-const savedTheme=localStorage.getItem("theme");
+const savedTheme = localStorage.getItem("theme");
 
-if(savedTheme==="dark"){
+if (savedTheme === "dark") {
 document.body.classList.add("dark-mode");
 }
 
 }
 
-function setFilter(filter){
-currentFilter=filter;
+function setFilter(filter) {
+currentFilter = filter;
 renderTasks();
 }
 
-function renderTasks(){
+function renderTasks() {
 
-taskList.innerHTML="";
+taskList.innerHTML = "";
 
-let filteredTasks=[...tasks];
+let filteredTasks = [...tasks];
 
-if(currentFilter==="HIGH")
-filteredTasks=filteredTasks.filter(t=>t.priority==="HIGH");
+if (currentFilter === "HIGH")
+filteredTasks = filteredTasks.filter(t => t.priority === "HIGH");
 
-else if(currentFilter==="MEDIUM")
-filteredTasks=filteredTasks.filter(t=>t.priority==="MEDIUM");
+else if (currentFilter === "MEDIUM")
+filteredTasks = filteredTasks.filter(t => t.priority === "MEDIUM");
 
-else if(currentFilter==="LOW")
-filteredTasks=filteredTasks.filter(t=>t.priority==="LOW");
+else if (currentFilter === "LOW")
+filteredTasks = filteredTasks.filter(t => t.priority === "LOW");
 
-else if(currentFilter==="COMPLETED")
-filteredTasks=filteredTasks.filter(t=>t.completed===true);
+else if (currentFilter === "COMPLETED")
+filteredTasks = filteredTasks.filter(t => t.completed === true);
 
-const searchText=searchInput.value.toLowerCase();
+const searchText = searchInput.value.toLowerCase();
 
-filteredTasks=filteredTasks.filter(task =>
+filteredTasks = filteredTasks.filter(task =>
 task.title.toLowerCase().includes(searchText) ||
 task.course.toLowerCase().includes(searchText)
 );
 
-if(sortOption.value==="earliest"){
-filteredTasks.sort((a,b)=>new Date(a.deadline)-new Date(b.deadline));
+if (sortOption.value === "earliest") {
+filteredTasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
 }
 
-if(sortOption.value==="latest"){
-filteredTasks.sort((a,b)=>new Date(b.deadline)-new Date(a.deadline));
+if (sortOption.value === "latest") {
+filteredTasks.sort((a, b) => new Date(b.deadline) - new Date(a.deadline));
 }
 
-filteredTasks.forEach(function(task){
+filteredTasks.forEach(function(task) {
 
-const li=document.createElement("li");
+const li = document.createElement("li");
 
-li.textContent=
-task.title+" | "+
-task.course+" | "+
-task.taskType+" | Deadline: "+
-task.deadline+" | Study Hours: "+
-task.studyHours+" | Priority: "+
-task.priority+" ";
+li.classList.add("task-card");
 
-if(task.priority==="HIGH") li.classList.add("high-priority");
-else if(task.priority==="MEDIUM") li.classList.add("medium-priority");
+if (task.priority === "HIGH") li.classList.add("high-priority");
+else if (task.priority === "MEDIUM") li.classList.add("medium-priority");
 else li.classList.add("low-priority");
 
-if(task.completed) li.classList.add("completed-task");
+if (task.completed) li.classList.add("completed-task");
 
-const completeButton=document.createElement("button");
-completeButton.textContent="Complete";
+li.innerHTML = `
+<div class="task-info">
+<h3>${task.title}</h3>
+<p><strong>Course:</strong> ${task.course}</p>
+<p><strong>Type:</strong> ${task.taskType}</p>
+<p><strong>Deadline:</strong> ${task.deadline || "N/A"}</p>
+<p><strong>Study Hours:</strong> ${task.studyHours || "0"}</p>
+<p><strong>Priority:</strong> ${task.priority}</p>
+</div>
 
-completeButton.addEventListener("click",function(){
+<div class="task-actions">
+<button class="complete-btn">Complete</button>
+<button class="delete-btn">Delete</button>
+</div>
+`;
 
-task.completed=!task.completed;
+const completeButton = li.querySelector(".complete-btn");
+const deleteButton = li.querySelector(".delete-btn");
+
+completeButton.addEventListener("click", function() {
+
+task.completed = !task.completed;
 
 saveTasks();
 renderTasks();
@@ -165,14 +174,10 @@ updateProgress();
 
 });
 
-const deleteButton=document.createElement("button");
-deleteButton.textContent="Delete";
+deleteButton.addEventListener("click", function() {
 
-deleteButton.addEventListener("click",function(){
-
-const index=tasks.indexOf(task);
-
-tasks.splice(index,1);
+const index = tasks.indexOf(task);
+tasks.splice(index, 1);
 
 saveTasks();
 renderTasks();
@@ -181,9 +186,6 @@ checkDeadlines();
 updateProgress();
 
 });
-
-li.appendChild(completeButton);
-li.appendChild(deleteButton);
 
 taskList.appendChild(li);
 
@@ -191,62 +193,62 @@ taskList.appendChild(li);
 
 }
 
-function updateStats(){
+function updateStats() {
 
-const total=tasks.length;
-const completed=tasks.filter(t=>t.completed).length;
-const highPriority=tasks.filter(t=>t.priority==="HIGH").length;
+const total = tasks.length;
+const completed = tasks.filter(t => t.completed).length;
+const highPriority = tasks.filter(t => t.priority === "HIGH").length;
 
-document.getElementById("totalTasks").textContent=total;
-document.getElementById("completedTasks").textContent=completed;
-document.getElementById("highPriorityTasks").textContent=highPriority;
-
-}
-
-function updateProgress(){
-
-const total=tasks.length;
-const completed=tasks.filter(t=>t.completed).length;
-
-let percent=0;
-
-if(total>0) percent=Math.round((completed/total)*100);
-
-document.getElementById("progressBar").style.width=percent+"%";
-document.getElementById("progressText").textContent=percent+"% Completed";
+document.getElementById("totalTasks").textContent = total;
+document.getElementById("completedTasks").textContent = completed;
+document.getElementById("highPriorityTasks").textContent = highPriority;
 
 }
 
-function checkDeadlines(){
+function updateProgress() {
 
-const warningsDiv=document.getElementById("warnings");
-warningsDiv.innerHTML="";
+const total = tasks.length;
+const completed = tasks.filter(t => t.completed).length;
 
-const today=new Date();
+let percent = 0;
 
-tasks.forEach(function(task){
+if (total > 0) percent = Math.round((completed / total) * 100);
 
-if(!task.deadline||task.completed) return;
+document.getElementById("progressBar").style.width = percent + "%";
+document.getElementById("progressText").textContent = percent + "% Completed";
 
-const dueDate=new Date(task.deadline);
+}
 
-const difference=dueDate-today;
-const daysLeft=Math.floor(difference/(1000*60*60*24));
+function checkDeadlines() {
 
-const warning=document.createElement("p");
+const warningsDiv = document.getElementById("warnings");
+warningsDiv.innerHTML = "";
 
-if(daysLeft<0){
+const today = new Date();
 
-warning.textContent="⚠ "+task.title+" is OVERDUE!";
-warning.style.color="red";
+tasks.forEach(function(task) {
+
+if (!task.deadline || task.completed) return;
+
+const dueDate = new Date(task.deadline);
+
+const difference = dueDate - today;
+const daysLeft = Math.floor(difference / (1000 * 60 * 60 * 24));
+
+const warning = document.createElement("p");
+
+if (daysLeft < 0) {
+
+warning.textContent = "⚠ " + task.title + " is OVERDUE!";
+warning.style.color = "red";
 warningsDiv.appendChild(warning);
 
 }
 
-else if(daysLeft<=2){
+else if (daysLeft <= 2) {
 
-warning.textContent="⚠ "+task.title+" is due in "+daysLeft+" day(s)";
-warning.style.color="orange";
+warning.textContent = "⚠ " + task.title + " is due in " + daysLeft + " day(s)";
+warning.style.color = "orange";
 warningsDiv.appendChild(warning);
 
 }
