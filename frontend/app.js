@@ -3,6 +3,8 @@ const taskList = document.getElementById("taskList");
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
+let currentFilter = "ALL";
+
 renderTasks();
 
 form.addEventListener("submit", function(event) {
@@ -42,7 +44,8 @@ form.addEventListener("submit", function(event) {
         taskType,
         deadline,
         studyHours,
-        priority
+        priority,
+        completed: false
     };
 
     tasks.push(task);
@@ -58,11 +61,34 @@ function saveTasks() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
+function setFilter(filter) {
+    currentFilter = filter;
+    renderTasks();
+}
+
 function renderTasks() {
 
     taskList.innerHTML = "";
 
-    tasks.sort(function(a, b) {
+    let filteredTasks = tasks;
+
+    if (currentFilter === "HIGH") {
+        filteredTasks = tasks.filter(task => task.priority === "HIGH");
+    }
+
+    else if (currentFilter === "MEDIUM") {
+        filteredTasks = tasks.filter(task => task.priority === "MEDIUM");
+    }
+
+    else if (currentFilter === "LOW") {
+        filteredTasks = tasks.filter(task => task.priority === "LOW");
+    }
+
+    else if (currentFilter === "COMPLETED") {
+        filteredTasks = tasks.filter(task => task.completed === true);
+    }
+
+    filteredTasks.sort(function(a, b) {
 
         const priorityOrder = {
             HIGH: 1,
@@ -74,7 +100,7 @@ function renderTasks() {
 
     });
 
-    tasks.forEach(function(task, index) {
+    filteredTasks.forEach(function(task, index) {
 
         const li = document.createElement("li");
 
@@ -101,20 +127,34 @@ function renderTasks() {
             li.classList.add("low-priority");
         }
 
+        if (task.completed) {
+            li.classList.add("completed-task");
+        }
+
         const completeButton = document.createElement("button");
         completeButton.textContent = "Complete";
 
         completeButton.addEventListener("click", function() {
-            li.classList.toggle("completed-task");
+
+            task.completed = !task.completed;
+
+            saveTasks();
+            renderTasks();
+
         });
 
         const deleteButton = document.createElement("button");
         deleteButton.textContent = "Delete";
 
         deleteButton.addEventListener("click", function() {
-            tasks.splice(index, 1);
+
+            const realIndex = tasks.indexOf(task);
+
+            tasks.splice(realIndex, 1);
+
             saveTasks();
             renderTasks();
+
         });
 
         li.appendChild(completeButton);
