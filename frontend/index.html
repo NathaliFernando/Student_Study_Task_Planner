@@ -2,9 +2,13 @@
 <html>
 
 <head>
+
 <title>Student Study Task Planner</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="stylesheet" href="styles.css">
+
 </head>
 
 <body>
@@ -12,8 +16,11 @@
 <div class="container">
 
 <header>
+
 <h1>Student Study Task Planner</h1>
+
 <button id="themeToggle">Toggle Dark Mode</button>
+
 </header>
 
 <section class="card">
@@ -46,6 +53,7 @@
 <section class="card">
 
 <h2>Search Tasks</h2>
+
 <input type="text" id="searchInput" placeholder="Search by title or course">
 
 </section>
@@ -65,6 +73,7 @@
 <section class="card">
 
 <h2>Deadline Warnings</h2>
+
 <div id="warnings"></div>
 
 </section>
@@ -124,6 +133,14 @@
 
 <section class="card">
 
+<h2>Task Analytics</h2>
+
+<canvas id="taskChart"></canvas>
+
+</section>
+
+<section class="card">
+
 <h2>Task List</h2>
 
 <ul id="taskList"></ul>
@@ -132,7 +149,10 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script src="app.js"></script>
 
 </body>
+
 </html>

@@ -8,18 +8,21 @@ let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
 let currentFilter = "ALL";
 
+let taskChart;
+
 loadTheme();
 
 renderTasks();
 updateStats();
 checkDeadlines();
 updateProgress();
+updateChart();
 
 searchInput.addEventListener("input", renderTasks);
 sortOption.addEventListener("change", renderTasks);
 themeToggle.addEventListener("click", toggleTheme);
 
-form.addEventListener("submit", function(event) {
+form.addEventListener("submit", function(event){
 
 event.preventDefault();
 
@@ -31,16 +34,16 @@ const studyHours = document.getElementById("studyHours").value;
 
 let priority = "LOW";
 
-if (deadline) {
+if(deadline){
 
 const today = new Date();
 const dueDate = new Date(deadline);
 
 const difference = dueDate - today;
-const daysLeft = difference / (1000 * 60 * 60 * 24);
+const daysLeft = difference / (1000*60*60*24);
 
-if (daysLeft <= 2) priority = "HIGH";
-else if (daysLeft <= 5) priority = "MEDIUM";
+if(daysLeft <= 2) priority = "HIGH";
+else if(daysLeft <= 5) priority = "MEDIUM";
 else priority = "LOW";
 
 }
@@ -52,7 +55,7 @@ taskType,
 deadline,
 studyHours,
 priority,
-completed: false
+completed:false
 };
 
 tasks.push(task);
@@ -62,58 +65,59 @@ renderTasks();
 updateStats();
 checkDeadlines();
 updateProgress();
+updateChart();
 
 form.reset();
 
 });
 
-function saveTasks() {
+function saveTasks(){
 localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-function toggleTheme() {
+function toggleTheme(){
 
 document.body.classList.toggle("dark-mode");
 
-if (document.body.classList.contains("dark-mode")) {
-localStorage.setItem("theme", "dark");
-} else {
-localStorage.setItem("theme", "light");
+if(document.body.classList.contains("dark-mode")){
+localStorage.setItem("theme","dark");
+}else{
+localStorage.setItem("theme","light");
 }
 
 }
 
-function loadTheme() {
+function loadTheme(){
 
 const savedTheme = localStorage.getItem("theme");
 
-if (savedTheme === "dark") {
+if(savedTheme === "dark"){
 document.body.classList.add("dark-mode");
 }
 
 }
 
-function setFilter(filter) {
+function setFilter(filter){
 currentFilter = filter;
 renderTasks();
 }
 
-function renderTasks() {
+function renderTasks(){
 
 taskList.innerHTML = "";
 
 let filteredTasks = [...tasks];
 
-if (currentFilter === "HIGH")
+if(currentFilter === "HIGH")
 filteredTasks = filteredTasks.filter(t => t.priority === "HIGH");
 
-else if (currentFilter === "MEDIUM")
+else if(currentFilter === "MEDIUM")
 filteredTasks = filteredTasks.filter(t => t.priority === "MEDIUM");
 
-else if (currentFilter === "LOW")
+else if(currentFilter === "LOW")
 filteredTasks = filteredTasks.filter(t => t.priority === "LOW");
 
-else if (currentFilter === "COMPLETED")
+else if(currentFilter === "COMPLETED")
 filteredTasks = filteredTasks.filter(t => t.completed === true);
 
 const searchText = searchInput.value.toLowerCase();
@@ -123,25 +127,25 @@ task.title.toLowerCase().includes(searchText) ||
 task.course.toLowerCase().includes(searchText)
 );
 
-if (sortOption.value === "earliest") {
-filteredTasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+if(sortOption.value === "earliest"){
+filteredTasks.sort((a,b)=>new Date(a.deadline)-new Date(b.deadline));
 }
 
-if (sortOption.value === "latest") {
-filteredTasks.sort((a, b) => new Date(b.deadline) - new Date(a.deadline));
+if(sortOption.value === "latest"){
+filteredTasks.sort((a,b)=>new Date(b.deadline)-new Date(a.deadline));
 }
 
-filteredTasks.forEach(function(task) {
+filteredTasks.forEach(function(task){
 
 const li = document.createElement("li");
 
 li.classList.add("task-card");
 
-if (task.priority === "HIGH") li.classList.add("high-priority");
-else if (task.priority === "MEDIUM") li.classList.add("medium-priority");
+if(task.priority === "HIGH") li.classList.add("high-priority");
+else if(task.priority === "MEDIUM") li.classList.add("medium-priority");
 else li.classList.add("low-priority");
 
-if (task.completed) li.classList.add("completed-task");
+if(task.completed) li.classList.add("completed-task");
 
 li.innerHTML = `
 <div class="task-info">
@@ -162,7 +166,7 @@ li.innerHTML = `
 const completeButton = li.querySelector(".complete-btn");
 const deleteButton = li.querySelector(".delete-btn");
 
-completeButton.addEventListener("click", function() {
+completeButton.addEventListener("click", function(){
 
 task.completed = !task.completed;
 
@@ -171,19 +175,21 @@ renderTasks();
 updateStats();
 checkDeadlines();
 updateProgress();
+updateChart();
 
 });
 
-deleteButton.addEventListener("click", function() {
+deleteButton.addEventListener("click", function(){
 
 const index = tasks.indexOf(task);
-tasks.splice(index, 1);
+tasks.splice(index,1);
 
 saveTasks();
 renderTasks();
 updateStats();
 checkDeadlines();
 updateProgress();
+updateChart();
 
 });
 
@@ -193,7 +199,7 @@ taskList.appendChild(li);
 
 }
 
-function updateStats() {
+function updateStats(){
 
 const total = tasks.length;
 const completed = tasks.filter(t => t.completed).length;
@@ -205,39 +211,39 @@ document.getElementById("highPriorityTasks").textContent = highPriority;
 
 }
 
-function updateProgress() {
+function updateProgress(){
 
 const total = tasks.length;
 const completed = tasks.filter(t => t.completed).length;
 
 let percent = 0;
 
-if (total > 0) percent = Math.round((completed / total) * 100);
+if(total > 0) percent = Math.round((completed/total)*100);
 
 document.getElementById("progressBar").style.width = percent + "%";
 document.getElementById("progressText").textContent = percent + "% Completed";
 
 }
 
-function checkDeadlines() {
+function checkDeadlines(){
 
 const warningsDiv = document.getElementById("warnings");
 warningsDiv.innerHTML = "";
 
 const today = new Date();
 
-tasks.forEach(function(task) {
+tasks.forEach(function(task){
 
-if (!task.deadline || task.completed) return;
+if(!task.deadline || task.completed) return;
 
 const dueDate = new Date(task.deadline);
 
 const difference = dueDate - today;
-const daysLeft = Math.floor(difference / (1000 * 60 * 60 * 24));
+const daysLeft = Math.floor(difference/(1000*60*60*24));
 
 const warning = document.createElement("p");
 
-if (daysLeft < 0) {
+if(daysLeft < 0){
 
 warning.textContent = "⚠ " + task.title + " is OVERDUE!";
 warning.style.color = "red";
@@ -245,12 +251,48 @@ warningsDiv.appendChild(warning);
 
 }
 
-else if (daysLeft <= 2) {
+else if(daysLeft <= 2){
 
 warning.textContent = "⚠ " + task.title + " is due in " + daysLeft + " day(s)";
 warning.style.color = "orange";
 warningsDiv.appendChild(warning);
 
+}
+
+});
+
+}
+
+function updateChart(){
+
+const completed = tasks.filter(t => t.completed).length;
+const pending = tasks.length - completed;
+
+const ctx = document.getElementById("taskChart");
+
+if(taskChart){
+taskChart.destroy();
+}
+
+taskChart = new Chart(ctx,{
+
+type:"doughnut",
+
+data:{
+labels:["Completed Tasks","Pending Tasks"],
+datasets:[{
+data:[completed,pending],
+backgroundColor:["#4CAF50","#ff7043"]
+}]
+},
+
+options:{
+responsive:true,
+plugins:{
+legend:{
+position:"bottom"
+}
+}
 }
 
 });
