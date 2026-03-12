@@ -1,5 +1,6 @@
 const form = document.getElementById("taskForm");
 const taskList = document.getElementById("taskList");
+const searchInput = document.getElementById("searchInput");
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
@@ -10,211 +11,209 @@ updateStats();
 checkDeadlines();
 updateProgress();
 
-form.addEventListener("submit", function(event) {
+searchInput.addEventListener("input", renderTasks);
 
-    event.preventDefault();
+form.addEventListener("submit", function(event){
 
-    const title = document.getElementById("title").value;
-    const course = document.getElementById("course").value;
-    const taskType = document.getElementById("taskType").value;
-    const deadline = document.getElementById("deadline").value;
-    const studyHours = document.getElementById("studyHours").value;
+event.preventDefault();
 
-    let priority = "LOW";
+const title=document.getElementById("title").value;
+const course=document.getElementById("course").value;
+const taskType=document.getElementById("taskType").value;
+const deadline=document.getElementById("deadline").value;
+const studyHours=document.getElementById("studyHours").value;
 
-    if (deadline) {
+let priority="LOW";
 
-        const today = new Date();
-        const dueDate = new Date(deadline);
+if(deadline){
 
-        const difference = dueDate - today;
-        const daysLeft = difference / (1000 * 60 * 60 * 24);
+const today=new Date();
+const dueDate=new Date(deadline);
 
-        if (daysLeft <= 2) {
-            priority = "HIGH";
-        } 
-        else if (daysLeft <= 5) {
-            priority = "MEDIUM";
-        } 
-        else {
-            priority = "LOW";
-        }
-    }
+const difference=dueDate-today;
+const daysLeft=difference/(1000*60*60*24);
 
-    const task = {
-        title,
-        course,
-        taskType,
-        deadline,
-        studyHours,
-        priority,
-        completed: false
-    };
+if(daysLeft<=2) priority="HIGH";
+else if(daysLeft<=5) priority="MEDIUM";
+else priority="LOW";
 
-    tasks.push(task);
+}
 
-    saveTasks();
-    renderTasks();
-    updateStats();
-    checkDeadlines();
-    updateProgress();
+const task={
+title,
+course,
+taskType,
+deadline,
+studyHours,
+priority,
+completed:false
+};
 
-    form.reset();
+tasks.push(task);
+
+saveTasks();
+renderTasks();
+updateStats();
+checkDeadlines();
+updateProgress();
+
+form.reset();
 
 });
 
 function saveTasks(){
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+localStorage.setItem("tasks",JSON.stringify(tasks));
 }
 
 function setFilter(filter){
-    currentFilter = filter;
-    renderTasks();
+currentFilter=filter;
+renderTasks();
 }
 
 function renderTasks(){
 
-    taskList.innerHTML = "";
+taskList.innerHTML="";
 
-    let filteredTasks = tasks;
+let filteredTasks=tasks;
 
-    if(currentFilter==="HIGH"){
-        filteredTasks = tasks.filter(task=>task.priority==="HIGH");
-    }
+if(currentFilter==="HIGH")
+filteredTasks=tasks.filter(t=>t.priority==="HIGH");
 
-    else if(currentFilter==="MEDIUM"){
-        filteredTasks = tasks.filter(task=>task.priority==="MEDIUM");
-    }
+else if(currentFilter==="MEDIUM")
+filteredTasks=tasks.filter(t=>t.priority==="MEDIUM");
 
-    else if(currentFilter==="LOW"){
-        filteredTasks = tasks.filter(task=>task.priority==="LOW");
-    }
+else if(currentFilter==="LOW")
+filteredTasks=tasks.filter(t=>t.priority==="LOW");
 
-    else if(currentFilter==="COMPLETED"){
-        filteredTasks = tasks.filter(task=>task.completed===true);
-    }
+else if(currentFilter==="COMPLETED")
+filteredTasks=tasks.filter(t=>t.completed===true);
 
-    filteredTasks.forEach(function(task){
+const searchText=searchInput.value.toLowerCase();
 
-        const li = document.createElement("li");
+filteredTasks=filteredTasks.filter(task =>
+task.title.toLowerCase().includes(searchText) ||
+task.course.toLowerCase().includes(searchText)
+);
 
-        li.textContent =
-        task.title+" | "+
-        task.course+" | "+
-        task.taskType+" | Deadline: "+
-        task.deadline+" | Study Hours: "+
-        task.studyHours+" | Priority: "+
-        task.priority+" ";
+filteredTasks.forEach(function(task){
 
-        if(task.priority==="HIGH") li.classList.add("high-priority");
-        else if(task.priority==="MEDIUM") li.classList.add("medium-priority");
-        else li.classList.add("low-priority");
+const li=document.createElement("li");
 
-        if(task.completed) li.classList.add("completed-task");
+li.textContent=
+task.title+" | "+
+task.course+" | "+
+task.taskType+" | Deadline: "+
+task.deadline+" | Study Hours: "+
+task.studyHours+" | Priority: "+
+task.priority+" ";
 
-        const completeButton = document.createElement("button");
-        completeButton.textContent="Complete";
+if(task.priority==="HIGH") li.classList.add("high-priority");
+else if(task.priority==="MEDIUM") li.classList.add("medium-priority");
+else li.classList.add("low-priority");
 
-        completeButton.addEventListener("click",function(){
+if(task.completed) li.classList.add("completed-task");
 
-            task.completed=!task.completed;
+const completeButton=document.createElement("button");
+completeButton.textContent="Complete";
 
-            saveTasks();
-            renderTasks();
-            updateStats();
-            checkDeadlines();
-            updateProgress();
+completeButton.addEventListener("click",function(){
 
-        });
+task.completed=!task.completed;
 
-        const deleteButton = document.createElement("button");
-        deleteButton.textContent="Delete";
+saveTasks();
+renderTasks();
+updateStats();
+checkDeadlines();
+updateProgress();
 
-        deleteButton.addEventListener("click",function(){
+});
 
-            const index = tasks.indexOf(task);
+const deleteButton=document.createElement("button");
+deleteButton.textContent="Delete";
 
-            tasks.splice(index,1);
+deleteButton.addEventListener("click",function(){
 
-            saveTasks();
-            renderTasks();
-            updateStats();
-            checkDeadlines();
-            updateProgress();
+const index=tasks.indexOf(task);
 
-        });
+tasks.splice(index,1);
 
-        li.appendChild(completeButton);
-        li.appendChild(deleteButton);
+saveTasks();
+renderTasks();
+updateStats();
+checkDeadlines();
+updateProgress();
 
-        taskList.appendChild(li);
+});
 
-    });
+li.appendChild(completeButton);
+li.appendChild(deleteButton);
+
+taskList.appendChild(li);
+
+});
 
 }
 
 function updateStats(){
 
-    const total = tasks.length;
-    const completed = tasks.filter(task=>task.completed).length;
-    const highPriority = tasks.filter(task=>task.priority==="HIGH").length;
+const total=tasks.length;
+const completed=tasks.filter(t=>t.completed).length;
+const highPriority=tasks.filter(t=>t.priority==="HIGH").length;
 
-    document.getElementById("totalTasks").textContent=total;
-    document.getElementById("completedTasks").textContent=completed;
-    document.getElementById("highPriorityTasks").textContent=highPriority;
+document.getElementById("totalTasks").textContent=total;
+document.getElementById("completedTasks").textContent=completed;
+document.getElementById("highPriorityTasks").textContent=highPriority;
 
 }
 
 function updateProgress(){
 
-    const total = tasks.length;
-    const completed = tasks.filter(task=>task.completed).length;
+const total=tasks.length;
+const completed=tasks.filter(t=>t.completed).length;
 
-    let percent = 0;
+let percent=0;
 
-    if(total>0){
-        percent = Math.round((completed/total)*100);
-    }
+if(total>0) percent=Math.round((completed/total)*100);
 
-    document.getElementById("progressBar").style.width = percent + "%";
-    document.getElementById("progressText").textContent = percent + "% Completed";
+document.getElementById("progressBar").style.width=percent+"%";
+document.getElementById("progressText").textContent=percent+"% Completed";
 
 }
 
 function checkDeadlines(){
 
-    const warningsDiv = document.getElementById("warnings");
-    warningsDiv.innerHTML="";
+const warningsDiv=document.getElementById("warnings");
+warningsDiv.innerHTML="";
 
-    const today = new Date();
+const today=new Date();
 
-    tasks.forEach(function(task){
+tasks.forEach(function(task){
 
-        if(!task.deadline || task.completed) return;
+if(!task.deadline||task.completed) return;
 
-        const dueDate = new Date(task.deadline);
+const dueDate=new Date(task.deadline);
 
-        const difference = dueDate - today;
-        const daysLeft = Math.floor(difference/(1000*60*60*24));
+const difference=dueDate-today;
+const daysLeft=Math.floor(difference/(1000*60*60*24));
 
-        const warning = document.createElement("p");
+const warning=document.createElement("p");
 
-        if(daysLeft<0){
+if(daysLeft<0){
 
-            warning.textContent="⚠ "+task.title+" is OVERDUE!";
-            warning.style.color="red";
-            warningsDiv.appendChild(warning);
+warning.textContent="⚠ "+task.title+" is OVERDUE!";
+warning.style.color="red";
+warningsDiv.appendChild(warning);
 
-        }
+}
 
-        else if(daysLeft<=2){
+else if(daysLeft<=2){
 
-            warning.textContent="⚠ "+task.title+" is due in "+daysLeft+" day(s)";
-            warning.style.color="orange";
-            warningsDiv.appendChild(warning);
+warning.textContent="⚠ "+task.title+" is due in "+daysLeft+" day(s)";
+warning.style.color="orange";
+warningsDiv.appendChild(warning);
 
-        }
+}
 
-    });
+});
 
 }
