@@ -1,21 +1,26 @@
-const form = document.getElementById("taskForm");
-const taskList = document.getElementById("taskList");
-const searchInput = document.getElementById("searchInput");
-const sortOption = document.getElementById("sortOption");
+const form=document.getElementById("taskForm");
+const taskList=document.getElementById("taskList");
+const searchInput=document.getElementById("searchInput");
+const sortOption=document.getElementById("sortOption");
+const themeToggle=document.getElementById("themeToggle");
 
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let tasks=JSON.parse(localStorage.getItem("tasks"))||[];
 
-let currentFilter = "ALL";
+let currentFilter="ALL";
+
+loadTheme();
 
 renderTasks();
 updateStats();
 checkDeadlines();
 updateProgress();
 
-searchInput.addEventListener("input", renderTasks);
-sortOption.addEventListener("change", renderTasks);
+searchInput.addEventListener("input",renderTasks);
+sortOption.addEventListener("change",renderTasks);
 
-form.addEventListener("submit", function(event){
+themeToggle.addEventListener("click",toggleTheme);
+
+form.addEventListener("submit",function(event){
 
 event.preventDefault();
 
@@ -67,6 +72,28 @@ function saveTasks(){
 localStorage.setItem("tasks",JSON.stringify(tasks));
 }
 
+function toggleTheme(){
+
+document.body.classList.toggle("dark-mode");
+
+if(document.body.classList.contains("dark-mode")){
+localStorage.setItem("theme","dark");
+}else{
+localStorage.setItem("theme","light");
+}
+
+}
+
+function loadTheme(){
+
+const savedTheme=localStorage.getItem("theme");
+
+if(savedTheme==="dark"){
+document.body.classList.add("dark-mode");
+}
+
+}
+
 function setFilter(filter){
 currentFilter=filter;
 renderTasks();
@@ -98,19 +125,11 @@ task.course.toLowerCase().includes(searchText)
 );
 
 if(sortOption.value==="earliest"){
-
-filteredTasks.sort((a,b)=>{
-return new Date(a.deadline) - new Date(b.deadline);
-});
-
+filteredTasks.sort((a,b)=>new Date(a.deadline)-new Date(b.deadline));
 }
 
 if(sortOption.value==="latest"){
-
-filteredTasks.sort((a,b)=>{
-return new Date(b.deadline) - new Date(a.deadline);
-});
-
+filteredTasks.sort((a,b)=>new Date(b.deadline)-new Date(a.deadline));
 }
 
 filteredTasks.forEach(function(task){
