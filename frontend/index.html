@@ -3,18 +3,24 @@
 
 <head>
 <title>Student Study Task Planner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-<button id="themeToggle">🌙 Toggle Dark Mode</button>
+<div class="container">
 
+<header>
 <h1>Student Study Task Planner</h1>
+<button id="themeToggle">Toggle Dark Mode</button>
+</header>
+
+<section class="card">
 
 <h2>Add Academic Task</h2>
 
-<form id="taskForm">
+<form id="taskForm" class="form-grid">
 
 <input type="text" id="title" placeholder="Task Title" required>
 
@@ -29,15 +35,22 @@
 
 <input type="date" id="deadline">
 
-<input type="number" id="studyHours" placeholder="Estimated Study Hours">
+<input type="number" id="studyHours" placeholder="Study Hours">
 
-<button type="submit">Add Task</button>
+<button type="submit" class="primary-btn">Add Task</button>
 
 </form>
 
-<h2>Search Tasks</h2>
+</section>
 
+<section class="card">
+
+<h2>Search Tasks</h2>
 <input type="text" id="searchInput" placeholder="Search by title or course">
+
+</section>
+
+<section class="card">
 
 <h2>Sort Tasks</h2>
 
@@ -47,16 +60,41 @@
 <option value="latest">Latest Deadline</option>
 </select>
 
-<h2>⚠ Deadline Warnings</h2>
+</section>
+
+<section class="card">
+
+<h2>Deadline Warnings</h2>
 <div id="warnings"></div>
+
+</section>
+
+<section class="card">
 
 <h2>Task Statistics</h2>
 
-<div id="stats">
-<p>Total Tasks: <span id="totalTasks">0</span></p>
-<p>Completed Tasks: <span id="completedTasks">0</span></p>
-<p>High Priority Tasks: <span id="highPriorityTasks">0</span></p>
+<div class="stats-grid">
+
+<div class="stat-box">
+<p>Total Tasks</p>
+<h3 id="totalTasks">0</h3>
 </div>
+
+<div class="stat-box">
+<p>Completed</p>
+<h3 id="completedTasks">0</h3>
+</div>
+
+<div class="stat-box">
+<p>High Priority</p>
+<h3 id="highPriorityTasks">0</h3>
+</div>
+
+</div>
+
+</section>
+
+<section class="card">
 
 <h2>Study Progress</h2>
 
@@ -66,17 +104,33 @@
 
 <p id="progressText">0% Completed</p>
 
+</section>
+
+<section class="card">
+
 <h2>Task Filters</h2>
 
-<button onclick="setFilter('ALL')">All Tasks</button>
-<button onclick="setFilter('HIGH')">High Priority</button>
-<button onclick="setFilter('MEDIUM')">Medium Priority</button>
-<button onclick="setFilter('LOW')">Low Priority</button>
+<div class="filter-buttons">
+
+<button onclick="setFilter('ALL')">All</button>
+<button onclick="setFilter('HIGH')">High</button>
+<button onclick="setFilter('MEDIUM')">Medium</button>
+<button onclick="setFilter('LOW')">Low</button>
 <button onclick="setFilter('COMPLETED')">Completed</button>
+
+</div>
+
+</section>
+
+<section class="card">
 
 <h2>Task List</h2>
 
 <ul id="taskList"></ul>
+
+</section>
+
+</div>
 
 <script src="app.js"></script>
 
