@@ -13,14 +13,16 @@
 
 <body>
 
+<nav class="navbar">
+<h2>Study Planner</h2>
+<button id="themeToggle">Toggle Dark Mode</button>
+</nav>
+
 <div class="container">
 
 <header>
-
-<h1>Student Study Task Planner</h1>
-
-<button id="themeToggle">Toggle Dark Mode</button>
-
+<h1>Student Study & Task Planner</h1>
+<p>Organize assignments, exams, and study sessions efficiently.</p>
 </header>
 
 <section class="card">
@@ -53,7 +55,6 @@
 <section class="card">
 
 <h2>Search Tasks</h2>
-
 <input type="text" id="searchInput" placeholder="Search by title or course">
 
 </section>
@@ -73,7 +74,6 @@
 <section class="card">
 
 <h2>Deadline Warnings</h2>
-
 <div id="warnings"></div>
 
 </section>
@@ -120,13 +120,11 @@
 <h2>Task Filters</h2>
 
 <div class="filter-buttons">
-
 <button onclick="setFilter('ALL')">All</button>
 <button onclick="setFilter('HIGH')">High</button>
 <button onclick="setFilter('MEDIUM')">Medium</button>
 <button onclick="setFilter('LOW')">Low</button>
 <button onclick="setFilter('COMPLETED')">Completed</button>
-
 </div>
 
 </section>
@@ -149,8 +147,11 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<footer class="footer">
+<p>Student Study Task Planner | Web Development Project</p>
+</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="app.js"></script>
 
 </body>
