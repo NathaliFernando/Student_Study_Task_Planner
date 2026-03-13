@@ -9,12 +9,15 @@
 
 <link rel="stylesheet" href="styles.css">
 
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 </head>
 
 <body>
 
 <nav class="navbar">
-<h2>Study Planner</h2>
+<h2><i class="fa-solid fa-graduation-cap"></i> Study Planner</h2>
 <button id="themeToggle">Toggle Dark Mode</button>
 </nav>
 
@@ -22,12 +25,12 @@
 
 <header>
 <h1>Student Study & Task Planner</h1>
-<p>Organize assignments, exams, and study sessions efficiently.</p>
+<p>Organize assignments, exams and study sessions efficiently.</p>
 </header>
 
 <section class="card">
 
-<h2>Add Academic Task</h2>
+<h2><i class="fa-solid fa-plus"></i> Add Academic Task</h2>
 
 <form id="taskForm" class="form-grid">
 
@@ -54,14 +57,15 @@
 
 <section class="card">
 
-<h2>Search Tasks</h2>
+<h2><i class="fa-solid fa-search"></i> Search Tasks</h2>
+
 <input type="text" id="searchInput" placeholder="Search by title or course">
 
 </section>
 
 <section class="card">
 
-<h2>Sort Tasks</h2>
+<h2><i class="fa-solid fa-sort"></i> Sort Tasks</h2>
 
 <select id="sortOption">
 <option value="none">No Sorting</option>
@@ -73,14 +77,15 @@
 
 <section class="card">
 
-<h2>Deadline Warnings</h2>
+<h2><i class="fa-solid fa-triangle-exclamation"></i> Deadline Warnings</h2>
+
 <div id="warnings"></div>
 
 </section>
 
 <section class="card">
 
-<h2>Task Statistics</h2>
+<h2><i class="fa-solid fa-chart-column"></i> Task Statistics</h2>
 
 <div class="stats-grid">
 
@@ -105,7 +110,7 @@
 
 <section class="card">
 
-<h2>Study Progress</h2>
+<h2><i class="fa-solid fa-chart-line"></i> Study Progress</h2>
 
 <div id="progressContainer">
 <div id="progressBar"></div>
@@ -117,21 +122,23 @@
 
 <section class="card">
 
-<h2>Task Filters</h2>
+<h2><i class="fa-solid fa-filter"></i> Task Filters</h2>
 
 <div class="filter-buttons">
+
 <button onclick="setFilter('ALL')">All</button>
 <button onclick="setFilter('HIGH')">High</button>
 <button onclick="setFilter('MEDIUM')">Medium</button>
 <button onclick="setFilter('LOW')">Low</button>
 <button onclick="setFilter('COMPLETED')">Completed</button>
+
 </div>
 
 </section>
 
 <section class="card">
 
-<h2>Task Analytics</h2>
+<h2><i class="fa-solid fa-chart-pie"></i> Task Analytics</h2>
 
 <canvas id="taskChart"></canvas>
 
@@ -139,7 +146,7 @@
 
 <section class="card">
 
-<h2>Task List</h2>
+<h2><i class="fa-solid fa-list"></i> Task List</h2>
 
 <ul id="taskList"></ul>
 
@@ -152,6 +159,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script src="app.js"></script>
 
 </body>

@@ -148,19 +148,31 @@ else li.classList.add("low-priority");
 if(task.completed) li.classList.add("completed-task");
 
 li.innerHTML = `
+
 <div class="task-info">
+
 <h3>${task.title}</h3>
+
 <p><strong>Course:</strong> ${task.course}</p>
+
 <p><strong>Type:</strong> ${task.taskType}</p>
+
 <p><strong>Deadline:</strong> ${task.deadline || "N/A"}</p>
+
 <p><strong>Study Hours:</strong> ${task.studyHours || "0"}</p>
+
 <p><strong>Priority:</strong> ${task.priority}</p>
+
 </div>
 
 <div class="task-actions">
-<button class="complete-btn">Complete</button>
-<button class="delete-btn">Delete</button>
+
+<button class="complete-btn"><i class="fa-solid fa-check"></i></button>
+
+<button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+
 </div>
+
 `;
 
 const completeButton = li.querySelector(".complete-btn");
