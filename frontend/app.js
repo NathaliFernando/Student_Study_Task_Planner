@@ -169,6 +169,8 @@ li.innerHTML = `
 
 <button class="complete-btn"><i class="fa-solid fa-check"></i></button>
 
+<button class="edit-btn"><i class="fa-solid fa-pen"></i></button>
+
 <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
 
 </div>
@@ -176,6 +178,7 @@ li.innerHTML = `
 `;
 
 const completeButton = li.querySelector(".complete-btn");
+const editButton = li.querySelector(".edit-btn");
 const deleteButton = li.querySelector(".delete-btn");
 
 completeButton.addEventListener("click", function(){
@@ -187,6 +190,21 @@ renderTasks();
 updateStats();
 checkDeadlines();
 updateProgress();
+updateChart();
+
+});
+
+editButton.addEventListener("click", function(){
+
+const newTitle = prompt("Edit Task Title", task.title);
+
+if(newTitle !== null){
+task.title = newTitle;
+}
+
+saveTasks();
+renderTasks();
+updateStats();
 updateChart();
 
 });
