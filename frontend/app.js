@@ -81,6 +81,7 @@ updateProgress();
 updateChart();
 updateCategoryChart();
 updateUpcomingTasks();
+renderCalendar();
 
 }
 
@@ -432,5 +433,34 @@ alert("Tasks imported successfully!");
 };
 
 reader.readAsText(file);
+
+}
+
+function renderCalendar(){
+
+const calendarEl = document.getElementById("calendar");
+
+if(!calendarEl) return;
+
+const events = tasks
+.filter(task => task.deadline)
+.map(task => ({
+title: task.title + " (" + task.course + ")",
+start: task.deadline
+}));
+
+calendarEl.innerHTML = "";
+
+const calendar = new FullCalendar.Calendar(calendarEl, {
+
+initialView: "dayGridMonth",
+
+height: 500,
+
+events: events
+
+});
+
+calendar.render();
 
 }

@@ -12,6 +12,8 @@
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+
 </head>
 
 <body>
@@ -184,6 +186,14 @@ Export Tasks to CSV
 
 <section class="card">
 
+<h2><i class="fa-solid fa-calendar-days"></i> Task Calendar</h2>
+
+<div id="calendar"></div>
+
+</section>
+
+<section class="card">
+
 <h2><i class="fa-solid fa-list"></i> Task List</h2>
 
 <ul id="taskList"></ul>
@@ -197,6 +207,8 @@ Export Tasks to CSV
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
 <script src="app.js"></script>
 
