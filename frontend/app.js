@@ -4,6 +4,8 @@ const searchInput = document.getElementById("searchInput");
 const sortOption = document.getElementById("sortOption");
 const themeToggle = document.getElementById("themeToggle");
 const exportBtn = document.getElementById("exportBtn");
+const importFile = document.getElementById("importFile");
+const importBtn = document.getElementById("importBtn");
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
@@ -19,6 +21,7 @@ searchInput.addEventListener("input", renderTasks);
 sortOption.addEventListener("change", renderTasks);
 themeToggle.addEventListener("click", toggleTheme);
 exportBtn.addEventListener("click", exportTasks);
+importBtn.addEventListener("click", importTasks);
 
 form.addEventListener("submit", function(event){
 
@@ -379,5 +382,55 @@ a.setAttribute("href", url);
 a.setAttribute("download", "tasks.csv");
 
 a.click();
+
+}
+
+function importTasks(){
+
+const file = importFile.files[0];
+
+if(!file){
+alert("Please select a CSV file.");
+return;
+}
+
+const reader = new FileReader();
+
+reader.onload = function(event){
+
+const csv = event.target.result;
+
+const lines = csv.split("\n");
+
+lines.shift(); // remove header
+
+lines.forEach(line => {
+
+if(!line.trim()) return;
+
+const [title, course, taskType, deadline, studyHours, priority, completed] = line.split(",");
+
+const task = {
+title,
+course,
+taskType,
+deadline,
+studyHours,
+priority,
+completed: completed === "true"
+};
+
+tasks.push(task);
+
+});
+
+saveTasks();
+refreshDashboard();
+
+alert("Tasks imported successfully!");
+
+};
+
+reader.readAsText(file);
 
 }
