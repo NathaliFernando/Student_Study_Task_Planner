@@ -3,25 +3,22 @@ const taskList = document.getElementById("taskList");
 const searchInput = document.getElementById("searchInput");
 const sortOption = document.getElementById("sortOption");
 const themeToggle = document.getElementById("themeToggle");
+const exportBtn = document.getElementById("exportBtn");
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
 let currentFilter = "ALL";
 
 let taskChart;
+let categoryChart;
 
 loadTheme();
-
-renderTasks();
-updateStats();
-checkDeadlines();
-updateProgress();
-updateChart();
-updateUpcomingTasks();
+refreshDashboard();
 
 searchInput.addEventListener("input", renderTasks);
 sortOption.addEventListener("change", renderTasks);
 themeToggle.addEventListener("click", toggleTheme);
+exportBtn.addEventListener("click", exportTasks);
 
 form.addEventListener("submit", function(event){
 
@@ -62,12 +59,7 @@ completed:false
 tasks.push(task);
 
 saveTasks();
-renderTasks();
-updateStats();
-checkDeadlines();
-updateProgress();
-updateChart();
-updateUpcomingTasks();
+refreshDashboard();
 
 form.reset();
 
@@ -75,6 +67,18 @@ form.reset();
 
 function saveTasks(){
 localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function refreshDashboard(){
+
+renderTasks();
+updateStats();
+checkDeadlines();
+updateProgress();
+updateChart();
+updateCategoryChart();
+updateUpcomingTasks();
+
 }
 
 function toggleTheme(){
@@ -188,12 +192,7 @@ completeButton.addEventListener("click", function(){
 task.completed = !task.completed;
 
 saveTasks();
-renderTasks();
-updateStats();
-checkDeadlines();
-updateProgress();
-updateChart();
-updateUpcomingTasks();
+refreshDashboard();
 
 });
 
@@ -206,10 +205,7 @@ task.title = newTitle;
 }
 
 saveTasks();
-renderTasks();
-updateStats();
-updateChart();
-updateUpcomingTasks();
+refreshDashboard();
 
 });
 
@@ -219,12 +215,7 @@ const index = tasks.indexOf(task);
 tasks.splice(index,1);
 
 saveTasks();
-renderTasks();
-updateStats();
-checkDeadlines();
-updateProgress();
-updateChart();
-updateUpcomingTasks();
+refreshDashboard();
 
 });
 
@@ -236,34 +227,30 @@ taskList.appendChild(li);
 
 function updateStats(){
 
-const total = tasks.length;
-const completed = tasks.filter(t => t.completed).length;
-const highPriority = tasks.filter(t => t.priority === "HIGH").length;
-
-document.getElementById("totalTasks").textContent = total;
-document.getElementById("completedTasks").textContent = completed;
-document.getElementById("highPriorityTasks").textContent = highPriority;
+document.getElementById("totalTasks").textContent = tasks.length;
+document.getElementById("completedTasks").textContent =
+tasks.filter(t=>t.completed).length;
+document.getElementById("highPriorityTasks").textContent =
+tasks.filter(t=>t.priority==="HIGH").length;
 
 }
 
 function updateProgress(){
 
 const total = tasks.length;
-const completed = tasks.filter(t => t.completed).length;
+const completed = tasks.filter(t=>t.completed).length;
 
-let percent = 0;
+let percent = total ? Math.round((completed/total)*100) : 0;
 
-if(total > 0) percent = Math.round((completed/total)*100);
-
-document.getElementById("progressBar").style.width = percent + "%";
-document.getElementById("progressText").textContent = percent + "% Completed";
+document.getElementById("progressBar").style.width = percent+"%";
+document.getElementById("progressText").textContent = percent+"% Completed";
 
 }
 
 function checkDeadlines(){
 
 const warningsDiv = document.getElementById("warnings");
-warningsDiv.innerHTML = "";
+warningsDiv.innerHTML="";
 
 const today = new Date();
 
@@ -272,7 +259,6 @@ tasks.forEach(function(task){
 if(!task.deadline || task.completed) return;
 
 const dueDate = new Date(task.deadline);
-
 const difference = dueDate - today;
 const daysLeft = Math.floor(difference/(1000*60*60*24));
 
@@ -280,54 +266,18 @@ const warning = document.createElement("p");
 
 if(daysLeft < 0){
 
-warning.textContent = "⚠ " + task.title + " is OVERDUE!";
-warning.style.color = "red";
+warning.textContent = "⚠ "+task.title+" is OVERDUE!";
+warning.style.color="red";
 warningsDiv.appendChild(warning);
 
 }
 
 else if(daysLeft <= 2){
 
-warning.textContent = "⚠ " + task.title + " is due in " + daysLeft + " day(s)";
-warning.style.color = "orange";
+warning.textContent = "⚠ "+task.title+" due in "+daysLeft+" day(s)";
+warning.style.color="orange";
 warningsDiv.appendChild(warning);
 
-}
-
-});
-
-}
-
-function updateChart(){
-
-const completed = tasks.filter(t => t.completed).length;
-const pending = tasks.length - completed;
-
-const ctx = document.getElementById("taskChart");
-
-if(taskChart){
-taskChart.destroy();
-}
-
-taskChart = new Chart(ctx,{
-
-type:"doughnut",
-
-data:{
-labels:["Completed Tasks","Pending Tasks"],
-datasets:[{
-data:[completed,pending],
-backgroundColor:["#4CAF50","#ff7043"]
-}]
-},
-
-options:{
-responsive:true,
-plugins:{
-legend:{
-position:"bottom"
-}
-}
 }
 
 });
@@ -337,10 +287,10 @@ position:"bottom"
 function updateUpcomingTasks(){
 
 const list = document.getElementById("upcomingTasks");
-list.innerHTML = "";
+list.innerHTML="";
 
 const upcoming = tasks
-.filter(task => task.deadline && !task.completed)
+.filter(task=>task.deadline && !task.completed)
 .sort((a,b)=>new Date(a.deadline)-new Date(b.deadline))
 .slice(0,3);
 
@@ -348,14 +298,86 @@ upcoming.forEach(task=>{
 
 const li = document.createElement("li");
 
-li.innerHTML = `
-<strong>${task.title}</strong>
-<br>
-${task.course} - Due: ${task.deadline}
-`;
+li.innerHTML=`<strong>${task.title}</strong><br>${task.course} - ${task.deadline}`;
 
 list.appendChild(li);
 
 });
+
+}
+
+function updateChart(){
+
+const completed = tasks.filter(t=>t.completed).length;
+const pending = tasks.length-completed;
+
+const ctx = document.getElementById("taskChart");
+
+if(taskChart) taskChart.destroy();
+
+taskChart = new Chart(ctx,{
+type:"doughnut",
+data:{
+labels:["Completed","Pending"],
+datasets:[{
+data:[completed,pending],
+backgroundColor:["#4CAF50","#ff7043"]
+}]
+}
+});
+
+}
+
+function updateCategoryChart(){
+
+const assignments = tasks.filter(t=>t.taskType==="Assignment").length;
+const exams = tasks.filter(t=>t.taskType==="Exam").length;
+const quizzes = tasks.filter(t=>t.taskType==="Quiz").length;
+const selfStudy = tasks.filter(t=>t.taskType==="Self Study").length;
+
+const ctx = document.getElementById("categoryChart");
+
+if(categoryChart) categoryChart.destroy();
+
+categoryChart = new Chart(ctx,{
+type:"bar",
+data:{
+labels:["Assignments","Exams","Quiz","Self Study"],
+datasets:[{
+label:"Tasks",
+data:[assignments,exams,quizzes,selfStudy],
+backgroundColor:["#42a5f5","#66bb6a","#ffa726","#ab47bc"]
+}]
+}
+});
+
+}
+
+function exportTasks(){
+
+if(tasks.length === 0){
+alert("No tasks to export.");
+return;
+}
+
+let csv = "Title,Course,Type,Deadline,StudyHours,Priority,Completed\n";
+
+tasks.forEach(task => {
+
+csv += `${task.title},${task.course},${task.taskType},${task.deadline},${task.studyHours},${task.priority},${task.completed}\n`;
+
+});
+
+const blob = new Blob([csv], { type: "text/csv" });
+
+const url = window.URL.createObjectURL(blob);
+
+const a = document.createElement("a");
+
+a.setAttribute("href", url);
+
+a.setAttribute("download", "tasks.csv");
+
+a.click();
 
 }
