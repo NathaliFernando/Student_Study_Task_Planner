@@ -13,6 +13,7 @@ let currentFilter = "ALL";
 
 let taskChart;
 let categoryChart;
+let studyHoursChart;
 
 loadTheme();
 refreshDashboard();
@@ -82,6 +83,7 @@ updateChart();
 updateCategoryChart();
 updateUpcomingTasks();
 renderCalendar();
+updateStudyHoursChart();
 
 }
 
@@ -462,5 +464,71 @@ events: events
 });
 
 calendar.render();
+
+}
+
+function updateStudyHoursChart(){
+
+const courseHours = {};
+
+tasks.forEach(task => {
+
+const course = task.course;
+const hours = parseFloat(task.studyHours) || 0;
+
+if(!courseHours[course]){
+courseHours[course] = 0;
+}
+
+courseHours[course] += hours;
+
+});
+
+const labels = Object.keys(courseHours);
+const data = Object.values(courseHours);
+
+const ctx = document.getElementById("studyHoursChart");
+
+if(!ctx) return;
+
+if(studyHoursChart){
+studyHoursChart.destroy();
+}
+
+studyHoursChart = new Chart(ctx, {
+
+type: "bar",
+
+data: {
+
+labels: labels,
+
+datasets: [{
+
+label: "Study Hours",
+
+data: data,
+
+backgroundColor: "#42a5f5"
+
+}]
+
+},
+
+options: {
+
+responsive: true,
+
+plugins: {
+
+legend: {
+display: false
+}
+
+}
+
+}
+
+});
 
 }
