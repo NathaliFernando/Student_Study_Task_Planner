@@ -17,6 +17,7 @@ updateStats();
 checkDeadlines();
 updateProgress();
 updateChart();
+updateUpcomingTasks();
 
 searchInput.addEventListener("input", renderTasks);
 sortOption.addEventListener("change", renderTasks);
@@ -66,6 +67,7 @@ updateStats();
 checkDeadlines();
 updateProgress();
 updateChart();
+updateUpcomingTasks();
 
 form.reset();
 
@@ -191,6 +193,7 @@ updateStats();
 checkDeadlines();
 updateProgress();
 updateChart();
+updateUpcomingTasks();
 
 });
 
@@ -206,6 +209,7 @@ saveTasks();
 renderTasks();
 updateStats();
 updateChart();
+updateUpcomingTasks();
 
 });
 
@@ -220,6 +224,7 @@ updateStats();
 checkDeadlines();
 updateProgress();
 updateChart();
+updateUpcomingTasks();
 
 });
 
@@ -324,6 +329,32 @@ position:"bottom"
 }
 }
 }
+
+});
+
+}
+
+function updateUpcomingTasks(){
+
+const list = document.getElementById("upcomingTasks");
+list.innerHTML = "";
+
+const upcoming = tasks
+.filter(task => task.deadline && !task.completed)
+.sort((a,b)=>new Date(a.deadline)-new Date(b.deadline))
+.slice(0,3);
+
+upcoming.forEach(task=>{
+
+const li = document.createElement("li");
+
+li.innerHTML = `
+<strong>${task.title}</strong>
+<br>
+${task.course} - Due: ${task.deadline}
+`;
+
+list.appendChild(li);
 
 });
 
