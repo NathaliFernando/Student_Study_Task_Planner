@@ -14,6 +14,7 @@ let currentFilter = "ALL";
 let taskChart;
 let categoryChart;
 let studyHoursChart;
+let completionTrendChart;
 
 loadTheme();
 refreshDashboard();
@@ -84,6 +85,7 @@ updateCategoryChart();
 updateUpcomingTasks();
 renderCalendar();
 updateStudyHoursChart();
+updateCompletionTrend();
 
 }
 
@@ -538,6 +540,77 @@ plugins: {
 
 legend: {
 display: false
+}
+
+}
+
+}
+
+});
+
+}
+
+function updateCompletionTrend(){
+
+const completionData = {};
+
+tasks.forEach(task => {
+
+if(task.completed && task.deadline){
+
+const date = task.deadline;
+
+if(!completionData[date]){
+completionData[date] = 0;
+}
+
+completionData[date]++;
+
+}
+
+});
+
+const labels = Object.keys(completionData);
+const data = Object.values(completionData);
+
+const ctx = document.getElementById("completionTrendChart");
+
+if(!ctx) return;
+
+if(completionTrendChart){
+completionTrendChart.destroy();
+}
+
+completionTrendChart = new Chart(ctx, {
+
+type: "line",
+
+data: {
+
+labels: labels,
+
+datasets: [{
+
+label: "Tasks Completed",
+
+data: data,
+
+borderColor: "#42a5f5",
+fill: false,
+tension: 0.3
+
+}]
+
+},
+
+options: {
+
+responsive: true,
+
+plugins: {
+
+legend: {
+display: true
 }
 
 }
