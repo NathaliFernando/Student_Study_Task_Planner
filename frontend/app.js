@@ -446,10 +446,25 @@ if(!calendarEl) return;
 
 const events = tasks
 .filter(task => task.deadline)
-.map(task => ({
+.map(task => {
+
+let color = "#4caf50";
+
+if(task.priority === "HIGH"){
+color = "#e53935";
+}
+else if(task.priority === "MEDIUM"){
+color = "#fbc02d";
+}
+
+return {
 title: task.title + " (" + task.course + ")",
-start: task.deadline
-}));
+start: task.deadline,
+backgroundColor: color,
+borderColor: color
+};
+
+});
 
 calendarEl.innerHTML = "";
 
