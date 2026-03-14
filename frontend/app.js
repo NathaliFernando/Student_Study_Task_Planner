@@ -86,6 +86,7 @@ updateUpcomingTasks();
 renderCalendar();
 updateStudyHoursChart();
 updateCompletionTrend();
+updateDashboardSummary();
 
 }
 
@@ -618,5 +619,34 @@ display: true
 }
 
 });
+
+}
+
+function updateDashboardSummary(){
+
+const total = tasks.length;
+const completed = tasks.filter(t => t.completed).length;
+const pending = total - completed;
+
+const today = new Date();
+
+const upcoming = tasks.filter(task => {
+
+if(!task.deadline || task.completed) return false;
+
+const dueDate = new Date(task.deadline);
+
+const difference = dueDate - today;
+
+const daysLeft = difference / (1000*60*60*24);
+
+return daysLeft >= 0 && daysLeft <= 7;
+
+}).length;
+
+document.getElementById("dashboardTotal").textContent = total;
+document.getElementById("dashboardCompleted").textContent = completed;
+document.getElementById("dashboardPending").textContent = pending;
+document.getElementById("dashboardUpcoming").textContent = upcoming;
 
 }
