@@ -7,6 +7,22 @@ const exportBtn = document.getElementById("exportBtn");
 const importFile = document.getElementById("importFile");
 const importBtn = document.getElementById("importBtn");
 
+function openTab(tabName){
+
+document.querySelectorAll(".tab-content").forEach(tab=>{
+tab.classList.remove("active");
+});
+
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+btn.classList.remove("active");
+});
+
+document.getElementById(tabName).classList.add("active");
+
+event.target.classList.add("active");
+
+}
+
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
 let currentFilter = "ALL";
@@ -35,21 +51,45 @@ const taskType = document.getElementById("taskType").value;
 const deadline = document.getElementById("deadline").value;
 const studyHours = document.getElementById("studyHours").value;
 
-let priority = "LOW";
+function calculatePriority(taskType, deadline, studyHours){
 
+let score = 0;
+
+// 1. Deadline urgency
 if(deadline){
-
 const today = new Date();
 const dueDate = new Date(deadline);
+const daysLeft = (dueDate - today)/(1000*60*60*24);
 
-const difference = dueDate - today;
-const daysLeft = difference / (1000*60*60*24);
+if(daysLeft <= 2) score += 50;
+else if(daysLeft <= 5) score += 30;
+else score += 10;
+}
 
-if(daysLeft <= 2) priority = "HIGH";
-else if(daysLeft <= 5) priority = "MEDIUM";
-else priority = "LOW";
+// 2. Study hours weight
+const hours = parseFloat(studyHours) || 0;
+
+if(hours >= 10) score += 30;
+else if(hours >= 5) score += 20;
+else score += 10;
+
+// 3. Task type importance
+if(taskType === "Exam") score += 30;
+else if(taskType === "Assignment") score += 20;
+else if(taskType === "Quiz") score += 15;
+else score += 10;
+
+// Convert score → priority label
+let priority = "LOW";
+
+if(score >= 70) priority = "HIGH";
+else if(score >= 40) priority = "MEDIUM";
+
+return {priority, score};
 
 }
+
+const result = calculatePriority(taskType, deadline, studyHours);
 
 const task = {
 title,
@@ -57,7 +97,8 @@ course,
 taskType,
 deadline,
 studyHours,
-priority,
+priority: result.priority,
+priorityScore: result.score,
 completed:false
 };
 
@@ -87,6 +128,7 @@ renderCalendar();
 updateStudyHoursChart();
 updateCompletionTrend();
 updateDashboardSummary();
+generateStudyPlan();
 
 }
 
@@ -177,6 +219,8 @@ li.innerHTML = `
 <p><strong>Study Hours:</strong> ${task.studyHours || "0"}</p>
 
 <p><strong>Priority:</strong> ${task.priority}</p>
+
+<p><strong>Score:</strong> ${task.priorityScore}</p>
 
 </div>
 
@@ -648,5 +692,28 @@ document.getElementById("dashboardTotal").textContent = total;
 document.getElementById("dashboardCompleted").textContent = completed;
 document.getElementById("dashboardPending").textContent = pending;
 document.getElementById("dashboardUpcoming").textContent = upcoming;
+
+}
+
+function generateStudyPlan(){
+
+const todayTasks = tasks
+.filter(t => !t.completed)
+.sort((a,b)=>b.priorityScore - a.priorityScore)
+.slice(0,3);
+
+const container = document.getElementById("studyPlan");
+
+if(!container) return;
+
+container.innerHTML = "";
+
+todayTasks.forEach(task=>{
+const p = document.createElement("p");
+
+p.innerHTML = `📘 <strong>${task.title}</strong> (${task.course})`;
+
+container.appendChild(p);
+});
 
 }
