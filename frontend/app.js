@@ -129,6 +129,7 @@ updateStudyHoursChart();
 updateCompletionTrend();
 updateDashboardSummary();
 generateStudyPlan();
+generateTimetable();
 
 }
 
@@ -714,6 +715,42 @@ const p = document.createElement("p");
 p.innerHTML = `📘 <strong>${task.title}</strong> (${task.course})`;
 
 container.appendChild(p);
+});
+
+}
+
+function generateTimetable(){
+
+const container = document.getElementById("timetable");
+
+if(!container) return;
+
+container.innerHTML = "";
+
+const todayTasks = tasks
+.filter(t => !t.completed)
+.sort((a,b)=>b.priorityScore - a.priorityScore)
+.slice(0,3);
+
+let startHour = 9;
+
+todayTasks.forEach(task => {
+
+let duration = parseFloat(task.studyHours) || 2;
+
+let endHour = startHour + duration;
+
+const div = document.createElement("p");
+
+div.innerHTML = `
+⏰ ${startHour}:00 - ${endHour}:00 → 
+<strong>${task.title}</strong> (${task.course})
+`;
+
+container.appendChild(div);
+
+startHour = endHour + 1;
+
 });
 
 }
