@@ -6,6 +6,9 @@ const themeToggle = document.getElementById("themeToggle");
 const exportBtn = document.getElementById("exportBtn");
 const importFile = document.getElementById("importFile");
 const importBtn = document.getElementById("importBtn");
+const DAILY_LIMIT = 6; // max study hours per day
+const MAX_SESSION = 2; // max hours per session before break
+const BREAK_TIME = 1;  // 1 hour break
 
 function openTab(tabName){
 
@@ -222,6 +225,8 @@ li.innerHTML = `
 <p><strong>Priority:</strong> ${task.priority}</p>
 
 <p><strong>Score:</strong> ${task.priorityScore}</p>
+
+<p><strong>Daily Limit:</strong> 6 hours</p>
 
 </div>
 
@@ -727,30 +732,59 @@ if(!container) return;
 
 container.innerHTML = "";
 
-const todayTasks = tasks
+const sortedTasks = tasks
 .filter(t => !t.completed)
-.sort((a,b)=>b.priorityScore - a.priorityScore)
-.slice(0,3);
+.sort((a,b)=>b.priorityScore - a.priorityScore);
 
+let remainingHours = DAILY_LIMIT;
 let startHour = 9;
 
-todayTasks.forEach(task => {
+sortedTasks.forEach(task => {
 
-let duration = parseFloat(task.studyHours) || 2;
+if(remainingHours <= 0) return;
 
-let endHour = startHour + duration;
+let taskHours = parseFloat(task.studyHours) || 2;
+
+while(taskHours > 0 && remainingHours > 0){
+
+let sessionHours = Math.min(taskHours, MAX_SESSION, remainingHours);
+
+let endHour = startHour + sessionHours;
 
 const div = document.createElement("p");
 
 div.innerHTML = `
-⏰ ${startHour}:00 - ${endHour}:00 → 
+📘 ${startHour}:00 - ${endHour}:00 → 
 <strong>${task.title}</strong> (${task.course})
 `;
 
 container.appendChild(div);
 
-startHour = endHour + 1;
+startHour = endHour;
+taskHours -= sessionHours;
+remainingHours -= sessionHours;
+
+// ADD BREAK if more work remains
+if(taskHours > 0 && remainingHours > 0){
+
+const breakDiv = document.createElement("p");
+
+breakDiv.innerHTML = `
+☕ ${startHour}:00 - ${startHour + BREAK_TIME}:00 → Break
+`;
+
+container.appendChild(breakDiv);
+
+startHour += BREAK_TIME;
+
+}
+
+}
 
 });
+
+if(container.innerHTML === ""){
+container.innerHTML = "<p>🎉 No tasks for today!</p>";
+}
 
 }
