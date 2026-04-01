@@ -1,6 +1,8 @@
 let users = JSON.parse(localStorage.getItem("users")) || {};
 let currentUser = localStorage.getItem("currentUser") || null;
 
+let calendar;
+
 const form = document.getElementById("taskForm");
 const taskList = document.getElementById("taskList");
 const searchInput = document.getElementById("searchInput");
@@ -149,7 +151,6 @@ updateProgress();
 updateChart();
 updateCategoryChart();
 updateUpcomingTasks();
-renderCalendar();
 updateStudyHoursChart();
 updateCompletionTrend();
 updateDashboardSummary();
@@ -522,18 +523,15 @@ const calendarEl = document.getElementById("calendar");
 
 if(!calendarEl) return;
 
+// prepare events
 const events = tasks
 .filter(task => task.deadline)
 .map(task => {
 
 let color = "#4caf50";
 
-if(task.priority === "HIGH"){
-color = "#e53935";
-}
-else if(task.priority === "MEDIUM"){
-color = "#fbc02d";
-}
+if(task.priority === "HIGH") color = "#e53935";
+else if(task.priority === "MEDIUM") color = "#fbc02d";
 
 return {
 title: task.title + " (" + task.course + ")",
@@ -544,18 +542,19 @@ borderColor: color
 
 });
 
-calendarEl.innerHTML = "";
+// destroy old calendar if exists
+if(calendar){
+calendar.destroy();
+}
 
-const calendar = new FullCalendar.Calendar(calendarEl, {
-
+// create new calendar
+calendar = new FullCalendar.Calendar(calendarEl, {
 initialView: "dayGridMonth",
-
 height: 500,
-
 events: events
-
 });
 
+// render
 calendar.render();
 
 }
@@ -857,10 +856,6 @@ if(daysLeft < 0){
 sendNotification("Overdue Task", task.title + " is overdue!");
 }
 
-else if(daysLeft <= 2){
-sendNotification("Upcoming Task", task.title + " is due soon!");
-}
-
 if(daysLeft <= 2 && !alreadyNotified(task.title)){
 sendNotification("Upcoming Task", task.title + " is due soon!");
 markNotified(task.title);
@@ -897,27 +892,10 @@ container.appendChild(p);
 
 function sendNotification(title, message){
 
-console.log("Sending notification...");
-
-if(!("Notification" in window)){
-alert("Notifications not supported");
-return;
-}
-
 if(Notification.permission === "granted"){
-
-alert("Permission granted — trying notification");
-
-const n = new Notification(title, {
-body: message,
-requireInteraction: true
+new Notification(title, {
+body: message
 });
-
-console.log("Notification object created:", n);
-
-}
-else{
-alert("Permission NOT granted");
 }
 
 }
@@ -951,11 +929,10 @@ return;
 Notification.requestPermission().then(permission => {
 
 if(permission === "granted"){
-alert("Notifications enabled!");
-sendNotification("Success", "Notifications are now working 🎉");
+alert("Notifications enabled successfully ✅");
 }
 else{
-alert("Permission denied!");
+alert("Permission denied ❌");
 }
 
 });
@@ -1168,4 +1145,33 @@ display.textContent = "No user logged in";
 if(currentUser){
 loadUserTasks();
 updateCurrentUserUI();
+}
+
+function showSection(sectionId){
+
+document.querySelectorAll(".section").forEach(sec=>{
+sec.style.display = "none";
+});
+
+const activeSection = document.getElementById(sectionId);
+activeSection.style.display = "block";
+
+// Only render when visible
+if(sectionId === "calendarTab"){
+setTimeout(()=>{
+renderCalendar();
+}, 200);
+}
+
+}
+
+showSection("dashboard");
+
+const menuToggle = document.getElementById("menuToggle");
+
+if(menuToggle){
+menuToggle.addEventListener("click", function(){
+console.log("Sidebar toggle clicked");
+document.getElementById("sidebar").classList.toggle("collapsed");
+});
 }

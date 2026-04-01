@@ -317,3 +317,83 @@ display:none;
 .tab-content.active{
 display:block;
 }
+
+/* LAYOUT */
+.layout{
+display:flex;
+}
+
+/* TOPBAR */
+.topbar{
+background:#4CAF50;
+color:white;
+padding:10px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.top-controls{
+display:flex;
+gap:10px;
+align-items:center;
+}
+
+/* SIDEBAR */
+.sidebar{
+width:200px;
+background:#2c3e50;
+color:white;
+padding:10px;
+transition:0.3s;
+overflow:hidden;
+}
+
+.sidebar.collapsed{
+width:60px;
+}
+
+/* Hide text when collapsed */
+.sidebar.collapsed span{
+display:none;
+}
+
+.sidebar i{
+margin-right:10px;
+}
+
+/* Sidebar list */
+.sidebar ul{
+list-style:none;
+padding:0;
+}
+
+.sidebar li{
+padding:10px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.sidebar li:hover{
+background:#34495e;
+}
+
+/* MAIN */
+.main-content{
+flex:1;
+padding:20px;
+}
+
+/* SECTIONS */
+.section{
+display:none;
+}
+
+.menu-btn{
+background:none;
+border:none;
+color:white;
+font-size:18px;
+cursor:pointer;
+margin-bottom:10px;
+}
