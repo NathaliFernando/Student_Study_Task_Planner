@@ -149,6 +149,7 @@ generateStudyPlan();
 generateTimetable();
 generateNotifications();
 generateWeeklyPlan();
+generatePrediction();
 
 }
 
@@ -1018,5 +1019,75 @@ dayDiv.appendChild(p);
 container.appendChild(dayDiv);
 
 });
+
+}
+
+function generatePrediction(){
+
+const container = document.getElementById("prediction");
+
+if(!container) return;
+
+container.innerHTML = "";
+
+const today = new Date();
+
+let totalHours = 0;
+let totalDays = 0;
+
+tasks.forEach(task => {
+
+if(task.completed) return;
+
+const hours = parseFloat(task.studyHours) || 0;
+
+if(task.deadline){
+
+const dueDate = new Date(task.deadline);
+const daysLeft = (dueDate - today)/(1000*60*60*24);
+
+if(daysLeft > 0){
+totalHours += hours;
+totalDays += daysLeft;
+}
+
+}
+
+});
+
+if(totalHours === 0 || totalDays === 0){
+container.innerHTML = "<p>No active tasks to predict.</p>";
+return;
+}
+
+const requiredPerDay = (totalHours / totalDays).toFixed(2);
+
+const p = document.createElement("p");
+
+p.innerHTML = `
+📚 Total Remaining Hours: <strong>${totalHours}</strong><br>
+📅 Estimated Days Left: <strong>${Math.round(totalDays)}</strong><br>
+⏱ Required Study Per Day: <strong>${requiredPerDay} hrs/day</strong>
+`;
+
+container.appendChild(p);
+
+// Evaluation
+const status = document.createElement("p");
+
+if(requiredPerDay <= DAILY_LIMIT){
+status.innerHTML = "✅ You are on track. Keep going!";
+status.style.color = "green";
+}
+else if(requiredPerDay <= DAILY_LIMIT * 1.5){
+status.innerHTML = "⚠ You need to increase your study time.";
+status.style.color = "orange";
+}
+else{
+status.innerHTML = "🔥 High risk! You may miss deadlines.";
+status.style.color = "red";
+}
+
+container.appendChild(status);
 
 }
