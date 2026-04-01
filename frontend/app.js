@@ -1,3 +1,6 @@
+let users = JSON.parse(localStorage.getItem("users")) || {};
+let currentUser = localStorage.getItem("currentUser") || null;
+
 const form = document.getElementById("taskForm");
 const taskList = document.getElementById("taskList");
 const searchInput = document.getElementById("searchInput");
@@ -117,7 +120,12 @@ form.reset();
 });
 
 function saveTasks(){
-localStorage.setItem("tasks", JSON.stringify(tasks));
+
+if(currentUser){
+users[currentUser] = tasks;
+localStorage.setItem("users", JSON.stringify(users));
+}
+
 }
 
 function requestNotificationPermission(){
@@ -1090,4 +1098,74 @@ status.style.color = "red";
 
 container.appendChild(status);
 
+}
+
+function loginUser(){
+
+const username = document.getElementById("username").value.trim();
+
+if(!username){
+alert("Enter a username");
+return;
+}
+
+// create user if doesn't exist
+if(!users[username]){
+users[username] = [];
+}
+
+currentUser = username;
+
+localStorage.setItem("users", JSON.stringify(users));
+localStorage.setItem("currentUser", username);
+
+loadUserTasks();
+updateCurrentUserUI();
+
+}
+
+function logoutUser(){
+
+currentUser = null;
+
+localStorage.removeItem("currentUser");
+
+tasks = [];
+
+refreshDashboard();
+updateCurrentUserUI();
+
+}
+
+function loadUserTasks(){
+
+if(currentUser && users[currentUser]){
+tasks = users[currentUser];
+}
+else{
+tasks = [];
+}
+
+refreshDashboard();
+
+}
+
+function updateCurrentUserUI(){
+
+const display = document.getElementById("currentUserDisplay");
+
+if(!display) return;
+
+if(currentUser){
+display.textContent = "Logged in as: " + currentUser;
+}
+else{
+display.textContent = "No user logged in";
+}
+
+}
+
+if(currentUser){
+loadUserTasks();
+updateCurrentUserUI();
 }
