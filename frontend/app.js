@@ -1175,3 +1175,9 @@ console.log("Sidebar toggle clicked");
 document.getElementById("sidebar").classList.toggle("collapsed");
 });
 }
+
+document.querySelectorAll(".sidebar li").forEach(li=>{
+li.classList.remove("active");
+});
+
+event.target.classList.add("active");
