@@ -28,6 +28,8 @@ event.target.classList.add("active");
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
+let notifiedTasks = JSON.parse(localStorage.getItem("notifiedTasks")) || [];
+
 let currentFilter = "ALL";
 
 let taskChart;
@@ -116,6 +118,18 @@ form.reset();
 
 function saveTasks(){
 localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function requestNotificationPermission(){
+
+if("Notification" in window){
+
+if(Notification.permission !== "granted"){
+Notification.requestPermission();
+}
+
+}
+
 }
 
 function refreshDashboard(){
@@ -829,6 +843,19 @@ p.style.color = "orange";
 container.appendChild(p);
 }
 
+if(daysLeft < 0){
+sendNotification("Overdue Task", task.title + " is overdue!");
+}
+
+else if(daysLeft <= 2){
+sendNotification("Upcoming Task", task.title + " is due soon!");
+}
+
+if(daysLeft <= 2 && !alreadyNotified(task.title)){
+sendNotification("Upcoming Task", task.title + " is due soon!");
+markNotified(task.title);
+}
+
 }
 
 });
@@ -855,5 +882,72 @@ p.innerHTML = `📅 Stay consistent! Focus on today's top priorities.`;
 container.appendChild(p);
 
 }
+
+}
+
+function sendNotification(title, message){
+
+console.log("Sending notification...");
+
+if(!("Notification" in window)){
+alert("Notifications not supported");
+return;
+}
+
+if(Notification.permission === "granted"){
+
+alert("Permission granted — trying notification");
+
+const n = new Notification(title, {
+body: message,
+requireInteraction: true
+});
+
+console.log("Notification object created:", n);
+
+}
+else{
+alert("Permission NOT granted");
+}
+
+}
+
+function testNotification(){
+console.log("Test button clicked");
+
+sendNotification(
+"Test Notification",
+"If you see this, notifications are working 🎉"
+);
+
+}
+
+function markNotified(taskTitle){
+notifiedTasks.push(taskTitle);
+localStorage.setItem("notifiedTasks", JSON.stringify(notifiedTasks));
+}
+
+function alreadyNotified(taskTitle){
+return notifiedTasks.includes(taskTitle);
+}
+
+function enableNotifications(){
+
+if(!("Notification" in window)){
+alert("Notifications not supported");
+return;
+}
+
+Notification.requestPermission().then(permission => {
+
+if(permission === "granted"){
+alert("Notifications enabled!");
+sendNotification("Success", "Notifications are now working 🎉");
+}
+else{
+alert("Permission denied!");
+}
+
+});
 
 }
