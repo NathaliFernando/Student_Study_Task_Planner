@@ -148,6 +148,7 @@ updateDashboardSummary();
 generateStudyPlan();
 generateTimetable();
 generateNotifications();
+generateWeeklyPlan();
 
 }
 
@@ -947,6 +948,74 @@ sendNotification("Success", "Notifications are now working 🎉");
 else{
 alert("Permission denied!");
 }
+
+});
+
+}
+
+function generateWeeklyPlan(){
+
+const container = document.getElementById("weeklyPlan");
+
+if(!container) return;
+
+container.innerHTML = "";
+
+const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+// group tasks by day
+const weeklyTasks = {};
+
+tasks.forEach(task => {
+
+if(!task.deadline) return;
+
+const date = new Date(task.deadline);
+const day = days[date.getDay()];
+
+if(!weeklyTasks[day]){
+weeklyTasks[day] = [];
+}
+
+weeklyTasks[day].push(task);
+
+});
+
+// render UI
+days.forEach(day => {
+
+const dayDiv = document.createElement("div");
+dayDiv.style.marginBottom = "10px";
+
+const title = document.createElement("strong");
+title.textContent = day;
+
+dayDiv.appendChild(title);
+
+// add tasks
+if(weeklyTasks[day]){
+
+weeklyTasks[day].forEach(task => {
+
+const p = document.createElement("p");
+
+p.innerHTML = `• ${task.title} (${task.course})`;
+
+dayDiv.appendChild(p);
+
+});
+
+}
+else{
+
+const p = document.createElement("p");
+p.textContent = "No tasks";
+
+dayDiv.appendChild(p);
+
+}
+
+container.appendChild(dayDiv);
 
 });
 
