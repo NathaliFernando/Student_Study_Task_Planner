@@ -378,6 +378,10 @@ transition:0.3s;
 background:#34495e;
 }
 
+.sidebar li.active{
+background:#1abc9c;
+}
+
 /* MAIN */
 .main-content{
 flex:1;
@@ -400,6 +404,15 @@ margin-bottom:10px;
 
 .card{
 margin-bottom:15px;
+}
+
+.card{
+transition:0.2s;
+}
+
+.card:hover{
+transform:translateY(-3px);
+box-shadow:0 6px 16px rgba(0,0,0,0.1);
 }
 
 button{

@@ -241,17 +241,11 @@ li.innerHTML = `
 <h3>${task.title}</h3>
 
 <p><strong>Course:</strong> ${task.course}</p>
-
 <p><strong>Type:</strong> ${task.taskType}</p>
-
 <p><strong>Deadline:</strong> ${task.deadline || "N/A"}</p>
-
 <p><strong>Study Hours:</strong> ${task.studyHours || "0"}</p>
-
 <p><strong>Priority:</strong> ${task.priority}</p>
-
 <p><strong>Score:</strong> ${task.priorityScore}</p>
-
 <p><strong>Daily Limit:</strong> 6 hours</p>
 
 </div>
@@ -259,9 +253,7 @@ li.innerHTML = `
 <div class="task-actions">
 
 <button class="complete-btn"><i class="fa-solid fa-check"></i></button>
-
 <button class="edit-btn"><i class="fa-solid fa-pen"></i></button>
-
 <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
 
 </div>
@@ -509,7 +501,7 @@ tasks.push(task);
 saveTasks();
 refreshDashboard();
 
-alert("Tasks imported successfully!");
+showToast("Tasks imported successfully!");
 
 };
 
@@ -926,10 +918,16 @@ alert("Notifications not supported");
 return;
 }
 
+// Already granted → NO popup
+if(Notification.permission === "granted"){
+console.log("Already enabled");
+return;
+}
+
 Notification.requestPermission().then(permission => {
 
 if(permission === "granted"){
-alert("Notifications enabled successfully ✅");
+showToast("Notifications enabled successfully ✅");
 }
 else{
 alert("Permission denied ❌");
@@ -1153,14 +1151,24 @@ document.querySelectorAll(".section").forEach(sec=>{
 sec.style.display = "none";
 });
 
+// highlight active menu
+document.querySelectorAll(".sidebar li").forEach(li=>{
+li.classList.remove("active");
+});
+
 const activeSection = document.getElementById(sectionId);
 activeSection.style.display = "block";
 
-// Only render when visible
+// highlight clicked item
+document.querySelectorAll(".sidebar li").forEach(li=>{
+if(li.getAttribute("onclick").includes(sectionId)){
+li.classList.add("active");
+}
+});
+
+// calendar fix
 if(sectionId === "calendarTab"){
-setTimeout(()=>{
-renderCalendar();
-}, 200);
+setTimeout(()=>{ renderCalendar(); }, 200);
 }
 
 }
@@ -1176,8 +1184,28 @@ document.getElementById("sidebar").classList.toggle("collapsed");
 });
 }
 
-document.querySelectorAll(".sidebar li").forEach(li=>{
-li.classList.remove("active");
-});
+function showToast(message){
 
-event.target.classList.add("active");
+const toast = document.createElement("div");
+toast.textContent = message;
+
+toast.style.position = "fixed";
+toast.style.bottom = "20px";
+toast.style.right = "20px";
+toast.style.background = "#333";
+toast.style.color = "white";
+toast.style.padding = "10px 15px";
+toast.style.borderRadius = "8px";
+toast.style.zIndex = "9999";
+
+document.body.appendChild(toast);
+
+setTimeout(()=>{
+toast.remove();
+}, 3000);
+
+}
+
+if(tasks.length === 0){
+taskList.innerHTML = "<p>No tasks yet. Add your first task 🚀</p>";
+}
