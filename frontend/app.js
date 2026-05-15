@@ -1,5 +1,22 @@
-let users = JSON.parse(localStorage.getItem("users")) || {};
-let currentUser = localStorage.getItem("currentUser") || null;
+/*
+=========================================
+SMART STUDY PLANNER - APPLICATION LOGIC
+=========================================
+
+Features:
+- Task management
+- Dashboard analytics
+- Notifications
+- Calendar integration
+- Study timetable generation
+- Progress tracking
+- CSV import/export
+- Weekly planning
+- Productivity prediction
+
+Author: Fernando Nathali
+=========================================
+*/
 
 let calendar;
 
@@ -15,7 +32,7 @@ const DAILY_LIMIT = 6; // max study hours per day
 const MAX_SESSION = 2; // max hours per session before break
 const BREAK_TIME = 1;  // 1 hour break
 
-function openTab(tabName){
+function openTab(tabName, event){
 
 document.querySelectorAll(".tab-content").forEach(tab=>{
 tab.classList.remove("active");
@@ -31,7 +48,7 @@ event.target.classList.add("active");
 
 }
 
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let tasks = [];
 
 let notifiedTasks = JSON.parse(localStorage.getItem("notifiedTasks")) || [];
 
@@ -123,21 +140,9 @@ form.reset();
 
 function saveTasks(){
 
-if(currentUser){
-users[currentUser] = tasks;
+if(currentUser && users[currentUser]){
+users[currentUser].tasks = tasks;
 localStorage.setItem("users", JSON.stringify(users));
-}
-
-}
-
-function requestNotificationPermission(){
-
-if("Notification" in window){
-
-if(Notification.permission !== "granted"){
-Notification.requestPermission();
-}
-
 }
 
 }
@@ -159,6 +164,7 @@ generateTimetable();
 generateNotifications();
 generateWeeklyPlan();
 generatePrediction();
+renderCalendar();
 
 }
 
@@ -299,6 +305,10 @@ refreshDashboard();
 taskList.appendChild(li);
 
 });
+
+if(filteredTasks.length === 0){
+taskList.innerHTML = "<p>No tasks found 🚀</p>";
+}
 
 }
 
@@ -491,7 +501,8 @@ taskType,
 deadline,
 studyHours,
 priority,
-completed: completed === "true"
+completed: completed === "true",
+priorityScore:0
 };
 
 tasks.push(task);
@@ -882,16 +893,6 @@ container.appendChild(p);
 
 }
 
-function sendNotification(title, message){
-
-if(Notification.permission === "granted"){
-new Notification(title, {
-body: message
-});
-}
-
-}
-
 function testNotification(){
 console.log("Test button clicked");
 
@@ -1075,49 +1076,11 @@ container.appendChild(status);
 
 }
 
-function loginUser(){
-
-const username = document.getElementById("username").value.trim();
-
-if(!username){
-alert("Enter a username");
-return;
-}
-
-// create user if doesn't exist
-if(!users[username]){
-users[username] = [];
-}
-
-currentUser = username;
-
-localStorage.setItem("users", JSON.stringify(users));
-localStorage.setItem("currentUser", username);
-
-loadUserTasks();
-updateCurrentUserUI();
-
-}
-
-function logoutUser(){
-
-currentUser = null;
-
-localStorage.removeItem("currentUser");
-
-tasks = [];
-
-refreshDashboard();
-updateCurrentUserUI();
-
-}
-
 function loadUserTasks(){
 
 if(currentUser && users[currentUser]){
-tasks = users[currentUser];
-}
-else{
+tasks = users[currentUser].tasks || [];
+}else{
 tasks = [];
 }
 
@@ -1125,25 +1088,17 @@ refreshDashboard();
 
 }
 
-function updateCurrentUserUI(){
+window.addEventListener("DOMContentLoaded", () => {
 
-const display = document.getElementById("currentUserDisplay");
-
-if(!display) return;
-
-if(currentUser){
-display.textContent = "Logged in as: " + currentUser;
-}
-else{
-display.textContent = "No user logged in";
-}
-
-}
-
-if(currentUser){
+if(typeof loadUserTasks === "function"){
 loadUserTasks();
+}
+
+if(typeof updateCurrentUserUI === "function"){
 updateCurrentUserUI();
 }
+
+});
 
 function showSection(sectionId){
 
@@ -1184,28 +1139,19 @@ document.getElementById("sidebar").classList.toggle("collapsed");
 });
 }
 
-function showToast(message){
+document.addEventListener("click", function(e){
 
-const toast = document.createElement("div");
-toast.textContent = message;
+const menu = document.getElementById("profileMenu");
+const icon = document.querySelector(".profile-icon");
 
-toast.style.position = "fixed";
-toast.style.bottom = "20px";
-toast.style.right = "20px";
-toast.style.background = "#333";
-toast.style.color = "white";
-toast.style.padding = "10px 15px";
-toast.style.borderRadius = "8px";
-toast.style.zIndex = "9999";
+if(!menu || !icon) return;
 
-document.body.appendChild(toast);
-
-setTimeout(()=>{
-toast.remove();
-}, 3000);
-
+if(!menu.contains(e.target) && !icon.contains(e.target)){
+menu.style.display = "none";
 }
 
-if(tasks.length === 0){
-taskList.innerHTML = "<p>No tasks yet. Add your first task 🚀</p>";
+});
+
+if(typeof updateCurrentUserUI === "function"){
+updateCurrentUserUI();
 }

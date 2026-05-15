@@ -26,16 +26,37 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 
 <div class="top-controls">
 
-<input type="text" id="username" placeholder="Username">
+<div class="auth-section" id="authSection">
 
+<input type="text" id="username" placeholder="Username">
+<input type="password" id="password" placeholder="Password">
+
+<button onclick="registerUser()">Register</button>
 <button onclick="loginUser()">Login</button>
+
+</div>
+
+<div class="profile-section" id="profileSection" style="display:none;">
+
+<div class="profile-icon" onclick="toggleProfileMenu()">
+    👤 <span id="profileName"></span>
+</div>
+
+<div class="profile-menu" id="profileMenu">
+
+<p id="profileNameDisplay"></p>
 <button onclick="logoutUser()">Logout</button>
 
-<button onclick="enableNotifications()">🔔 Enable Notifications</button>
+</div>
+
+</div>
+
+<button onclick="enableNotifications()">🔔</button>
 
 <p id="currentUserDisplay"></p>
 
 </div>
+
 </div>
 
 <div class="layout">
@@ -248,7 +269,10 @@ Enable Notifications
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+<script src="auth.js"></script>
 <script src="app.js"></script>
+<script src="utils.js"></script>
 
 </body>
 </html>

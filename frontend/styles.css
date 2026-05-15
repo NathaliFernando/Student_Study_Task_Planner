@@ -339,6 +339,25 @@ gap:10px;
 align-items:center;
 }
 
+.top-controls input{
+padding:6px;
+border-radius:6px;
+border:1px solid #ccc;
+}
+
+.top-controls button{
+padding:6px 10px;
+border:none;
+border-radius:6px;
+background:#2c3e50;
+color:white;
+cursor:pointer;
+}
+
+.top-controls button:hover{
+background:#34495e;
+}
+
 /* SIDEBAR */
 .sidebar{
 width:200px;
@@ -427,4 +446,33 @@ transform:scale(1.05);
 padding:5px;
 border-radius:5px;
 border:none;
+}
+
+.profile-section{
+position:relative;
+}
+
+.profile-icon{
+cursor:pointer;
+font-size:20px;
+background:#2c3e50;
+color:white;
+padding:8px;
+border-radius:50%;
+}
+
+.profile-menu{
+position:absolute;
+right:0;
+top:40px;
+background:white;
+border-radius:8px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
+padding:10px;
+display:none;
+}
+
+.profile-menu button{
+width:100%;
+margin-top:5px;
 }
