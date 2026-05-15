@@ -137,6 +137,14 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 <div id="notifications"></div>
 </section>
 
+<div class="insights-box">
+
+<h2>Smart Insights</h2>
+
+<div id="insights"></div>
+
+</div>
+
 <button onclick="testNotification()" class="primary-btn">
 Test Notification
 </button>
@@ -187,18 +195,39 @@ Enable Notifications
 
 <section class="card">
 <h2>Filters</h2>
-<div class="filter-buttons">
-<button onclick="setFilter('ALL')">All</button>
-<button onclick="setFilter('HIGH')">High</button>
-<button onclick="setFilter('MEDIUM')">Medium</button>
-<button onclick="setFilter('LOW')">Low</button>
-<button onclick="setFilter('COMPLETED')">Completed</button>
+<div class="filters">
+
+<button class="filter-btn filter-all"
+onclick="setFilter('ALL')">
+All
+</button>
+
+<button class="filter-btn filter-high"
+onclick="setFilter('HIGH')">
+High
+</button>
+
+<button class="filter-btn filter-medium"
+onclick="setFilter('MEDIUM')">
+Medium
+</button>
+
+<button class="filter-btn filter-low"
+onclick="setFilter('LOW')">
+Low
+</button>
+
+<button class="filter-btn filter-completed"
+onclick="setFilter('COMPLETED')">
+Completed
+</button>
+
 </div>
 </section>
 
 <section class="card">
 <h2>Task List</h2>
-<ul id="taskList"></ul>
+<div id="taskList" class="task-grid"></div>
 </section>
 
 </div>
@@ -276,6 +305,38 @@ Enable Notifications
 <script src="auth.js"></script>
 <script src="app.js"></script>
 <script src="utils.js"></script>
+
+<!-- =========================
+     EDIT TASK MODAL
+========================= -->
+
+<div id="editModal" class="modal">
+
+<div class="modal-content">
+
+<h2>Edit Task</h2>
+
+<input type="text" id="editTitle" placeholder="Task Title">
+
+<input type="text" id="editCourse" placeholder="Course">
+
+<input type="number" id="editHours" placeholder="Study Hours">
+
+<div class="modal-buttons">
+
+<button onclick="saveEditedTask()">
+Save
+</button>
+
+<button onclick="closeModal()" class="cancel-btn">
+Cancel
+</button>
+
+</div>
+
+</div>
+
+</div>
 
 <footer class="footer">
     <p>Student Study Task Planner</p>

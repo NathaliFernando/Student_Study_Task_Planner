@@ -20,6 +20,8 @@ Author: Fernando Nathali
 
 let calendar;
 
+let currentEditTask = null;
+
 const form = document.getElementById("taskForm");
 const taskList = document.getElementById("taskList");
 const searchInput = document.getElementById("searchInput");
@@ -165,6 +167,7 @@ generateNotifications();
 generateWeeklyPlan();
 generatePrediction();
 renderCalendar();
+generateInsights();
 
 }
 
@@ -240,11 +243,28 @@ else li.classList.add("low-priority");
 
 if(task.completed) li.classList.add("completed-task");
 
+let courseColor = "#1e88e5";
+
+if(task.course.includes("Java")){
+courseColor = "#1e88e5";
+}
+else if(task.course.includes("Math")){
+courseColor = "#43a047";
+}
+else if(task.course.includes("Requirement")){
+courseColor = "#8e24aa";
+}
+else if(task.course.includes("IT")){
+courseColor = "#fb8c00";
+}
+
 li.innerHTML = `
 
 <div class="task-info">
 
-<h3>${task.title}</h3>
+<h3 style="color:${courseColor}">
+${task.title}
+</h3>
 
 <p><strong>Course:</strong> ${task.course}</p>
 <p><strong>Type:</strong> ${task.taskType}</p>
@@ -281,14 +301,13 @@ refreshDashboard();
 
 editButton.addEventListener("click", function(){
 
-const newTitle = prompt("Edit Task Title", task.title);
+currentEditTask = task;
 
-if(newTitle !== null){
-task.title = newTitle;
-}
+document.getElementById("editTitle").value = task.title;
+document.getElementById("editCourse").value = task.course;
+document.getElementById("editHours").value = task.studyHours;
 
-saveTasks();
-refreshDashboard();
+document.getElementById("editModal").style.display = "flex";
 
 });
 
@@ -559,9 +578,36 @@ calendar.destroy();
 
 // create new calendar
 calendar = new FullCalendar.Calendar(calendarEl, {
+
 initialView: "dayGridMonth",
+
 height: 500,
-events: events
+
+events: events,
+
+eventClick: function(info){
+
+alert(
+info.event.title +
+"\nDeadline: " +
+info.event.start.toLocaleDateString()
+);
+
+},
+
+eventMouseEnter: function(info){
+
+info.el.style.transform = "scale(1.05)";
+info.el.style.transition = "0.2s";
+
+},
+
+eventMouseLeave: function(info){
+
+info.el.style.transform = "scale(1)";
+
+}
+
 });
 
 // render
@@ -1172,3 +1218,78 @@ if(loadingScreen){
 }
 
 });
+
+function closeModal(){
+document.getElementById("editModal").style.display = "none";
+}
+
+function saveEditedTask(){
+
+if(!currentEditTask) return;
+
+currentEditTask.title =
+document.getElementById("editTitle").value;
+
+currentEditTask.course =
+document.getElementById("editCourse").value;
+
+currentEditTask.studyHours =
+document.getElementById("editHours").value;
+
+saveTasks();
+refreshDashboard();
+
+closeModal();
+
+showToast("Task updated successfully ✅");
+
+}
+
+function generateInsights(){
+
+const container = document.getElementById("insights");
+
+if(!container) return;
+
+container.innerHTML = "";
+
+if(tasks.length === 0){
+container.innerHTML = "No insights available.";
+return;
+}
+
+const completed =
+tasks.filter(t=>t.completed).length;
+
+const completionRate =
+Math.round((completed/tasks.length)*100);
+
+const courseCount = {};
+
+tasks.forEach(task=>{
+
+if(!courseCount[task.course]){
+courseCount[task.course] = 0;
+}
+
+courseCount[task.course]++;
+
+});
+
+const topCourse =
+Object.keys(courseCount).reduce((a,b)=>
+courseCount[a] > courseCount[b] ? a : b
+);
+
+container.innerHTML = `
+<p>📚 Most active course:
+<strong>${topCourse}</strong></p>
+
+<p>✅ Completion Rate:
+<strong>${completionRate}%</strong></p>
+
+<p>📝 Total Tasks:
+<strong>${tasks.length}</strong></p>
+`;
+
+}
