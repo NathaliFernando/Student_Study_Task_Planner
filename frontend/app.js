@@ -307,7 +307,14 @@ taskList.appendChild(li);
 });
 
 if(filteredTasks.length === 0){
-taskList.innerHTML = "<p>No tasks found 🚀</p>";
+
+taskList.innerHTML = `
+<div class="empty-state">
+    <i class="fa-solid fa-book-open"></i>
+    <p>No tasks found 🚀</p>
+</div>
+`;
+
 }
 
 }
@@ -1155,3 +1162,13 @@ menu.style.display = "none";
 if(typeof updateCurrentUserUI === "function"){
 updateCurrentUserUI();
 }
+
+window.addEventListener("load", () => {
+
+const loadingScreen = document.getElementById("loadingScreen");
+
+if(loadingScreen){
+    loadingScreen.style.display = "none";
+}
+
+});

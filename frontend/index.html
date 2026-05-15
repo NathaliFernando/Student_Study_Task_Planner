@@ -20,9 +20,14 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 
 <!-- TOP NAVBAR -->
 <div class="navbar">
-<h2>🎓 Study Planner</h2>
 
-<button id="themeToggle">Toggle Dark Mode</button>
+<div class="app-brand">
+    <i class="fa-solid fa-graduation-cap"></i>
+    <div>
+        <h1>Smart Study Planner</h1>
+        <p>Version 1.0</p>
+    </div>
+</div>
 
 <div class="top-controls">
 
@@ -54,6 +59,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 <button onclick="enableNotifications()">🔔</button>
 
 <p id="currentUserDisplay"></p>
+
+<button id="themeToggle">Toggle Dark Mode</button>
 
 </div>
 
@@ -263,16 +270,22 @@ Enable Notifications
 
 </div>
 
-<footer class="footer">
-<p>Student Study Task Planner</p>
-</footer>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
 <script src="auth.js"></script>
 <script src="app.js"></script>
 <script src="utils.js"></script>
+
+<footer class="footer">
+    <p>Student Study Task Planner</p>
+    <p>Developed by Fernando Nathali © 2026</p>
+</footer>
+
+<div id="loadingScreen" class="loading-screen">
+    <div class="loader"></div>
+    <p>Loading Smart Study Planner...</p>
+</div>
 
 </body>
 </html>
