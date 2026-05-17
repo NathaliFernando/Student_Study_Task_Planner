@@ -18,7 +18,17 @@ Author: Fernando Nathali
 // AUTHENTICATION SYSTEM
 // =========================
 
-let users = JSON.parse(localStorage.getItem("users")) || {};
+"use strict";
+
+let users;
+
+try{
+users = JSON.parse(localStorage.getItem("users")) || {};
+}
+catch{
+users = {};
+}
+
 let currentUser = localStorage.getItem("currentUser") || null;
 
 let loginAttempts = 0;
@@ -135,6 +145,8 @@ function logoutUser(){
 // =========================
 
 function loadUserTasks(){
+
+console.log("loadUserTasks running");
 
     if(currentUser && users[currentUser]){
         tasks = users[currentUser].tasks || [];

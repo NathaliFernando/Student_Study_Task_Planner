@@ -18,9 +18,20 @@ Author: Fernando Nathali
 =========================================
 */
 
-let calendar;
+"use strict";
+
+console.log("app.js loaded");
+
+let tasks = [];
+
+let currentFilter = "ALL";
 
 let currentEditTask = null;
+
+let taskChart = null;
+let categoryChart = null;
+let studyHoursChart = null;
+let calendar = null;
 
 const form = document.getElementById("taskForm");
 const taskList = document.getElementById("taskList");
@@ -50,35 +61,19 @@ event.target.classList.add("active");
 
 }
 
-let tasks = [];
-
 let notifiedTasks = JSON.parse(localStorage.getItem("notifiedTasks")) || [];
 
-let currentFilter = "ALL";
-
-let taskChart;
-let categoryChart;
-let studyHoursChart;
 let completionTrendChart;
 
 loadTheme();
-refreshDashboard();
+//refreshDashboard();
+//renderTasks();
 
 searchInput.addEventListener("input", renderTasks);
 sortOption.addEventListener("change", renderTasks);
 themeToggle.addEventListener("click", toggleTheme);
 exportBtn.addEventListener("click", exportTasks);
 importBtn.addEventListener("click", importTasks);
-
-form.addEventListener("submit", function(event){
-
-event.preventDefault();
-
-const title = document.getElementById("title").value;
-const course = document.getElementById("course").value;
-const taskType = document.getElementById("taskType").value;
-const deadline = document.getElementById("deadline").value;
-const studyHours = document.getElementById("studyHours").value;
 
 function calculatePriority(taskType, deadline, studyHours){
 
@@ -118,9 +113,19 @@ return {priority, score};
 
 }
 
+form.addEventListener("submit", function(event){
+
+event.preventDefault();
+
+const title = document.getElementById("title").value;
+const course = document.getElementById("course").value;
+const taskType = document.getElementById("taskType").value;
+const deadline = document.getElementById("deadline").value;
+const studyHours = document.getElementById("studyHours").value;
 const result = calculatePriority(taskType, deadline, studyHours);
 
 const task = {
+id: Date.now(),
 title,
 course,
 taskType,
@@ -139,37 +144,6 @@ refreshDashboard();
 form.reset();
 
 });
-
-function saveTasks(){
-
-if(currentUser && users[currentUser]){
-users[currentUser].tasks = tasks;
-localStorage.setItem("users", JSON.stringify(users));
-}
-
-}
-
-function refreshDashboard(){
-
-renderTasks();
-updateStats();
-checkDeadlines();
-updateProgress();
-updateChart();
-updateCategoryChart();
-updateUpcomingTasks();
-updateStudyHoursChart();
-updateCompletionTrend();
-updateDashboardSummary();
-generateStudyPlan();
-generateTimetable();
-generateNotifications();
-generateWeeklyPlan();
-generatePrediction();
-renderCalendar();
-generateInsights();
-
-}
 
 function toggleTheme(){
 
@@ -196,168 +170,6 @@ document.body.classList.add("dark-mode");
 function setFilter(filter){
 currentFilter = filter;
 renderTasks();
-}
-
-function renderTasks(){
-
-taskList.innerHTML = "";
-
-let filteredTasks = [...tasks];
-
-if(currentFilter === "HIGH")
-filteredTasks = filteredTasks.filter(t => t.priority === "HIGH");
-
-else if(currentFilter === "MEDIUM")
-filteredTasks = filteredTasks.filter(t => t.priority === "MEDIUM");
-
-else if(currentFilter === "LOW")
-filteredTasks = filteredTasks.filter(t => t.priority === "LOW");
-
-else if(currentFilter === "COMPLETED")
-filteredTasks = filteredTasks.filter(t => t.completed === true);
-
-const searchText = searchInput.value.toLowerCase();
-
-filteredTasks = filteredTasks.filter(task =>
-task.title.toLowerCase().includes(searchText) ||
-task.course.toLowerCase().includes(searchText)
-);
-
-if(sortOption.value === "earliest"){
-filteredTasks.sort((a,b)=>new Date(a.deadline)-new Date(b.deadline));
-}
-
-if(sortOption.value === "latest"){
-filteredTasks.sort((a,b)=>new Date(b.deadline)-new Date(a.deadline));
-}
-
-filteredTasks.forEach(function(task){
-
-const li = document.createElement("li");
-
-li.classList.add("task-card");
-
-if(task.priority === "HIGH") li.classList.add("high-priority");
-else if(task.priority === "MEDIUM") li.classList.add("medium-priority");
-else li.classList.add("low-priority");
-
-if(task.completed) li.classList.add("completed-task");
-
-let courseColor = "#1e88e5";
-
-if(task.course.includes("Java")){
-courseColor = "#1e88e5";
-}
-else if(task.course.includes("Math")){
-courseColor = "#43a047";
-}
-else if(task.course.includes("Requirement")){
-courseColor = "#8e24aa";
-}
-else if(task.course.includes("IT")){
-courseColor = "#fb8c00";
-}
-
-li.innerHTML = `
-
-<div class="task-info">
-
-<h3 style="color:${courseColor}">
-${task.title}
-</h3>
-
-<p><strong>Course:</strong> ${task.course}</p>
-<p><strong>Type:</strong> ${task.taskType}</p>
-<p><strong>Deadline:</strong> ${task.deadline || "N/A"}</p>
-<p><strong>Study Hours:</strong> ${task.studyHours || "0"}</p>
-<p><strong>Priority:</strong> ${task.priority}</p>
-<p><strong>Score:</strong> ${task.priorityScore}</p>
-<p><strong>Daily Limit:</strong> 6 hours</p>
-
-</div>
-
-<div class="task-actions">
-
-<button class="complete-btn"><i class="fa-solid fa-check"></i></button>
-<button class="edit-btn"><i class="fa-solid fa-pen"></i></button>
-<button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
-
-</div>
-
-`;
-
-const completeButton = li.querySelector(".complete-btn");
-const editButton = li.querySelector(".edit-btn");
-const deleteButton = li.querySelector(".delete-btn");
-
-completeButton.addEventListener("click", function(){
-
-task.completed = !task.completed;
-
-saveTasks();
-refreshDashboard();
-
-});
-
-editButton.addEventListener("click", function(){
-
-currentEditTask = task;
-
-document.getElementById("editTitle").value = task.title;
-document.getElementById("editCourse").value = task.course;
-document.getElementById("editHours").value = task.studyHours;
-
-document.getElementById("editModal").style.display = "flex";
-
-});
-
-deleteButton.addEventListener("click", function(){
-
-const index = tasks.indexOf(task);
-tasks.splice(index,1);
-
-saveTasks();
-refreshDashboard();
-
-});
-
-taskList.appendChild(li);
-
-});
-
-if(filteredTasks.length === 0){
-
-taskList.innerHTML = `
-<div class="empty-state">
-    <i class="fa-solid fa-book-open"></i>
-    <p>No tasks found 🚀</p>
-</div>
-`;
-
-}
-
-}
-
-function updateStats(){
-
-document.getElementById("totalTasks").textContent = tasks.length;
-document.getElementById("completedTasks").textContent =
-tasks.filter(t=>t.completed).length;
-document.getElementById("highPriorityTasks").textContent =
-tasks.filter(t=>t.priority==="HIGH").length;
-
-}
-
-function updateProgress(){
-
-const total = tasks.length;
-const completed = tasks.filter(t=>t.completed).length;
-
-let percent = total ? Math.round((completed/total)*100) : 0;
-
-document.getElementById("progressBar").style.width = percent+"%";
-document.getElementById("progressText").textContent = percent+"% Completed";
-
 }
 
 function checkDeadlines(){
@@ -409,273 +221,11 @@ const upcoming = tasks
 
 upcoming.forEach(task=>{
 
-const li = document.createElement("li");
+const taskCard = document.createElement("div");
 
-li.innerHTML=`<strong>${task.title}</strong><br>${task.course} - ${task.deadline}`;
+taskCard.innerHTML=`<strong>${task.title}</strong><br>${task.course} - ${task.deadline}`;
 
-list.appendChild(li);
-
-});
-
-}
-
-function updateChart(){
-
-const completed = tasks.filter(t=>t.completed).length;
-const pending = tasks.length-completed;
-
-const ctx = document.getElementById("taskChart");
-
-if(taskChart) taskChart.destroy();
-
-taskChart = new Chart(ctx,{
-type:"doughnut",
-data:{
-labels:["Completed","Pending"],
-datasets:[{
-data:[completed,pending],
-backgroundColor:["#4CAF50","#ff7043"]
-}]
-}
-});
-
-}
-
-function updateCategoryChart(){
-
-const assignments = tasks.filter(t=>t.taskType==="Assignment").length;
-const exams = tasks.filter(t=>t.taskType==="Exam").length;
-const quizzes = tasks.filter(t=>t.taskType==="Quiz").length;
-const selfStudy = tasks.filter(t=>t.taskType==="Self Study").length;
-
-const ctx = document.getElementById("categoryChart");
-
-if(categoryChart) categoryChart.destroy();
-
-categoryChart = new Chart(ctx,{
-type:"bar",
-data:{
-labels:["Assignments","Exams","Quiz","Self Study"],
-datasets:[{
-label:"Tasks",
-data:[assignments,exams,quizzes,selfStudy],
-backgroundColor:["#42a5f5","#66bb6a","#ffa726","#ab47bc"]
-}]
-}
-});
-
-}
-
-function exportTasks(){
-
-if(tasks.length === 0){
-alert("No tasks to export.");
-return;
-}
-
-let csv = "Title,Course,Type,Deadline,StudyHours,Priority,Completed\n";
-
-tasks.forEach(task => {
-
-csv += `${task.title},${task.course},${task.taskType},${task.deadline},${task.studyHours},${task.priority},${task.completed}\n`;
-
-});
-
-const blob = new Blob([csv], { type: "text/csv" });
-
-const url = window.URL.createObjectURL(blob);
-
-const a = document.createElement("a");
-
-a.setAttribute("href", url);
-
-a.setAttribute("download", "tasks.csv");
-
-a.click();
-
-}
-
-function importTasks(){
-
-const file = importFile.files[0];
-
-if(!file){
-alert("Please select a CSV file.");
-return;
-}
-
-const reader = new FileReader();
-
-reader.onload = function(event){
-
-const csv = event.target.result;
-
-const lines = csv.split("\n");
-
-lines.shift(); // remove header
-
-lines.forEach(line => {
-
-if(!line.trim()) return;
-
-const [title, course, taskType, deadline, studyHours, priority, completed] = line.split(",");
-
-const task = {
-title,
-course,
-taskType,
-deadline,
-studyHours,
-priority,
-completed: completed === "true",
-priorityScore:0
-};
-
-tasks.push(task);
-
-});
-
-saveTasks();
-refreshDashboard();
-
-showToast("Tasks imported successfully!");
-
-};
-
-reader.readAsText(file);
-
-}
-
-function renderCalendar(){
-
-const calendarEl = document.getElementById("calendar");
-
-if(!calendarEl) return;
-
-// prepare events
-const events = tasks
-.filter(task => task.deadline)
-.map(task => {
-
-let color = "#4caf50";
-
-if(task.priority === "HIGH") color = "#e53935";
-else if(task.priority === "MEDIUM") color = "#fbc02d";
-
-return {
-title: task.title + " (" + task.course + ")",
-start: task.deadline,
-backgroundColor: color,
-borderColor: color
-};
-
-});
-
-// destroy old calendar if exists
-if(calendar){
-calendar.destroy();
-}
-
-// create new calendar
-calendar = new FullCalendar.Calendar(calendarEl, {
-
-initialView: "dayGridMonth",
-
-height: 500,
-
-events: events,
-
-eventClick: function(info){
-
-alert(
-info.event.title +
-"\nDeadline: " +
-info.event.start.toLocaleDateString()
-);
-
-},
-
-eventMouseEnter: function(info){
-
-info.el.style.transform = "scale(1.05)";
-info.el.style.transition = "0.2s";
-
-},
-
-eventMouseLeave: function(info){
-
-info.el.style.transform = "scale(1)";
-
-}
-
-});
-
-// render
-calendar.render();
-
-}
-
-function updateStudyHoursChart(){
-
-const courseHours = {};
-
-tasks.forEach(task => {
-
-const course = task.course;
-const hours = parseFloat(task.studyHours) || 0;
-
-if(!courseHours[course]){
-courseHours[course] = 0;
-}
-
-courseHours[course] += hours;
-
-});
-
-const labels = Object.keys(courseHours);
-const data = Object.values(courseHours);
-
-const ctx = document.getElementById("studyHoursChart");
-
-if(!ctx) return;
-
-if(studyHoursChart){
-studyHoursChart.destroy();
-}
-
-studyHoursChart = new Chart(ctx, {
-
-type: "bar",
-
-data: {
-
-labels: labels,
-
-datasets: [{
-
-label: "Study Hours",
-
-data: data,
-
-backgroundColor: "#42a5f5"
-
-}]
-
-},
-
-options: {
-
-responsive: true,
-
-plugins: {
-
-legend: {
-display: false
-}
-
-}
-
-}
+list.appendChild(taskCard);
 
 });
 
@@ -738,6 +288,8 @@ options: {
 
 responsive: true,
 
+maintainAspectRatio:false,
+
 plugins: {
 
 legend: {
@@ -749,35 +301,6 @@ display: true
 }
 
 });
-
-}
-
-function updateDashboardSummary(){
-
-const total = tasks.length;
-const completed = tasks.filter(t => t.completed).length;
-const pending = total - completed;
-
-const today = new Date();
-
-const upcoming = tasks.filter(task => {
-
-if(!task.deadline || task.completed) return false;
-
-const dueDate = new Date(task.deadline);
-
-const difference = dueDate - today;
-
-const daysLeft = difference / (1000*60*60*24);
-
-return daysLeft >= 0 && daysLeft <= 7;
-
-}).length;
-
-document.getElementById("dashboardTotal").textContent = total;
-document.getElementById("dashboardCompleted").textContent = completed;
-document.getElementById("dashboardPending").textContent = pending;
-document.getElementById("dashboardUpcoming").textContent = upcoming;
 
 }
 
@@ -869,93 +392,6 @@ container.innerHTML = "<p>🎉 No tasks for today!</p>";
 
 }
 
-function generateNotifications(){
-
-const container = document.getElementById("notifications");
-
-if(!container) return;
-
-container.innerHTML = "";
-
-const today = new Date();
-
-let totalStudyHours = 0;
-
-tasks.forEach(task => {
-
-if(task.completed) return;
-
-// Calculate total workload
-totalStudyHours += parseFloat(task.studyHours) || 0;
-
-// Deadline checks
-if(task.deadline){
-
-const dueDate = new Date(task.deadline);
-const daysLeft = Math.floor((dueDate - today)/(1000*60*60*24));
-
-const p = document.createElement("p");
-
-if(daysLeft < 0){
-p.innerHTML = `❌ <strong>${task.title}</strong> is overdue!`;
-p.style.color = "red";
-container.appendChild(p);
-}
-
-else if(daysLeft <= 2){
-p.innerHTML = `⚠ <strong>${task.title}</strong> due in ${daysLeft} day(s)`;
-p.style.color = "orange";
-container.appendChild(p);
-}
-
-if(daysLeft < 0){
-sendNotification("Overdue Task", task.title + " is overdue!");
-}
-
-if(daysLeft <= 2 && !alreadyNotified(task.title)){
-sendNotification("Upcoming Task", task.title + " is due soon!");
-markNotified(task.title);
-}
-
-}
-
-});
-
-// Workload warning
-if(totalStudyHours > DAILY_LIMIT * 2){
-
-const p = document.createElement("p");
-
-p.innerHTML = `🔥 High workload detected. Consider spreading tasks.`;
-p.style.color = "crimson";
-
-container.appendChild(p);
-
-}
-
-// Daily motivation / reminder
-if(tasks.length > 0){
-
-const p = document.createElement("p");
-
-p.innerHTML = `📅 Stay consistent! Focus on today's top priorities.`;
-
-container.appendChild(p);
-
-}
-
-}
-
-function testNotification(){
-console.log("Test button clicked");
-
-sendNotification(
-"Test Notification",
-"If you see this, notifications are working 🎉"
-);
-
-}
-
 function markNotified(taskTitle){
 notifiedTasks.push(taskTitle);
 localStorage.setItem("notifiedTasks", JSON.stringify(notifiedTasks));
@@ -963,32 +399,6 @@ localStorage.setItem("notifiedTasks", JSON.stringify(notifiedTasks));
 
 function alreadyNotified(taskTitle){
 return notifiedTasks.includes(taskTitle);
-}
-
-function enableNotifications(){
-
-if(!("Notification" in window)){
-alert("Notifications not supported");
-return;
-}
-
-// Already granted → NO popup
-if(Notification.permission === "granted"){
-console.log("Already enabled");
-return;
-}
-
-Notification.requestPermission().then(permission => {
-
-if(permission === "granted"){
-showToast("Notifications enabled successfully ✅");
-}
-else{
-alert("Permission denied ❌");
-}
-
-});
-
 }
 
 function generateWeeklyPlan(){
@@ -1059,88 +469,6 @@ container.appendChild(dayDiv);
 
 }
 
-function generatePrediction(){
-
-const container = document.getElementById("prediction");
-
-if(!container) return;
-
-container.innerHTML = "";
-
-const today = new Date();
-
-let totalHours = 0;
-let totalDays = 0;
-
-tasks.forEach(task => {
-
-if(task.completed) return;
-
-const hours = parseFloat(task.studyHours) || 0;
-
-if(task.deadline){
-
-const dueDate = new Date(task.deadline);
-const daysLeft = (dueDate - today)/(1000*60*60*24);
-
-if(daysLeft > 0){
-totalHours += hours;
-totalDays += daysLeft;
-}
-
-}
-
-});
-
-if(totalHours === 0 || totalDays === 0){
-container.innerHTML = "<p>No active tasks to predict.</p>";
-return;
-}
-
-const requiredPerDay = (totalHours / totalDays).toFixed(2);
-
-const p = document.createElement("p");
-
-p.innerHTML = `
-📚 Total Remaining Hours: <strong>${totalHours}</strong><br>
-📅 Estimated Days Left: <strong>${Math.round(totalDays)}</strong><br>
-⏱ Required Study Per Day: <strong>${requiredPerDay} hrs/day</strong>
-`;
-
-container.appendChild(p);
-
-// Evaluation
-const status = document.createElement("p");
-
-if(requiredPerDay <= DAILY_LIMIT){
-status.innerHTML = "✅ You are on track. Keep going!";
-status.style.color = "green";
-}
-else if(requiredPerDay <= DAILY_LIMIT * 1.5){
-status.innerHTML = "⚠ You need to increase your study time.";
-status.style.color = "orange";
-}
-else{
-status.innerHTML = "🔥 High risk! You may miss deadlines.";
-status.style.color = "red";
-}
-
-container.appendChild(status);
-
-}
-
-function loadUserTasks(){
-
-if(currentUser && users[currentUser]){
-tasks = users[currentUser].tasks || [];
-}else{
-tasks = [];
-}
-
-refreshDashboard();
-
-}
-
 window.addEventListener("DOMContentLoaded", () => {
 
 if(typeof loadUserTasks === "function"){
@@ -1179,6 +507,11 @@ if(sectionId === "calendarTab"){
 setTimeout(()=>{ renderCalendar(); }, 200);
 }
 
+if(window.innerWidth < 768){
+document.getElementById("sidebar")
+.classList.add("collapsed");
+}
+
 }
 
 showSection("dashboard");
@@ -1207,17 +540,7 @@ menu.style.display = "none";
 
 if(typeof updateCurrentUserUI === "function"){
 updateCurrentUserUI();
-}
-
-window.addEventListener("load", () => {
-
-const loadingScreen = document.getElementById("loadingScreen");
-
-if(loadingScreen){
-    loadingScreen.style.display = "none";
-}
-
-});
+};
 
 function closeModal(){
 document.getElementById("editModal").style.display = "none";
@@ -1245,51 +568,23 @@ showToast("Task updated successfully ✅");
 
 }
 
-function generateInsights(){
+document.addEventListener("DOMContentLoaded", function(){
 
-const container = document.getElementById("insights");
+setTimeout(() => {
 
-if(!container) return;
+const loader = document.getElementById("loader");
 
-container.innerHTML = "";
+if(loader){
+loader.style.opacity = "0";
 
-if(tasks.length === 0){
-container.innerHTML = "No insights available.";
-return;
+setTimeout(()=>{
+loader.style.display = "none";
+},500);
 }
 
-const completed =
-tasks.filter(t=>t.completed).length;
-
-const completionRate =
-Math.round((completed/tasks.length)*100);
-
-const courseCount = {};
-
-tasks.forEach(task=>{
-
-if(!courseCount[task.course]){
-courseCount[task.course] = 0;
-}
-
-courseCount[task.course]++;
+}, 800);
 
 });
 
-const topCourse =
-Object.keys(courseCount).reduce((a,b)=>
-courseCount[a] > courseCount[b] ? a : b
-);
-
-container.innerHTML = `
-<p>📚 Most active course:
-<strong>${topCourse}</strong></p>
-
-<p>✅ Completion Rate:
-<strong>${completionRate}%</strong></p>
-
-<p>📝 Total Tasks:
-<strong>${tasks.length}</strong></p>
-`;
-
-}
+document.getElementById("appVersion")
+.textContent = "Version 1.0";

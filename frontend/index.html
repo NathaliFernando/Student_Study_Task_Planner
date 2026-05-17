@@ -25,8 +25,16 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     <i class="fa-solid fa-graduation-cap"></i>
     <div>
         <h1>Smart Study Planner</h1>
-        <p>Version 1.0</p>
+        <p id="appVersion"></p>
     </div>
+</div>
+
+<div class="dashboard-header">
+
+<p>
+Manage your academic workload efficiently.
+</p>
+
 </div>
 
 <div class="top-controls">
@@ -145,12 +153,12 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 
 </div>
 
-<button onclick="testNotification()" class="primary-btn">
-Test Notification
-</button>
-
 <button onclick="enableNotifications()" class="primary-btn">
 Enable Notifications
+</button>
+
+<button onclick="disableNotifications()" class="primary-btn">
+Disable Notifications
 </button>
 
 </div>
@@ -302,9 +310,14 @@ Completed
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
+<script src="utils.js"></script>
+<script src="tasks.js"></script>
+<script src="dashboard.js"></script>
+<script src="analytics.js"></script>
+<script src="calendar.js"></script>
+<script src="notifications.js"></script>
 <script src="auth.js"></script>
 <script src="app.js"></script>
-<script src="utils.js"></script>
 
 <!-- =========================
      EDIT TASK MODAL
@@ -338,14 +351,33 @@ Cancel
 
 </div>
 
+<div class="quick-actions">
+
+<button onclick="showSection('tasks')">
+➕ Add Task
+</button>
+
+<button onclick="clearCompletedTasks()">
+🗑 Clear Completed
+</button>
+
+<button onclick="exportTasks()">
+📤 Export
+</button>
+
+</div>
+
 <footer class="footer">
     <p>Student Study Task Planner</p>
     <p>Developed by Fernando Nathali © 2026</p>
 </footer>
 
-<div id="loadingScreen" class="loading-screen">
-    <div class="loader"></div>
-    <p>Loading Smart Study Planner...</p>
+<div id="loader">
+
+<div class="spinner"></div>
+
+<p>Loading Smart Study Planner...</p>
+
 </div>
 
 </body>
