@@ -1,54 +1,67 @@
 /*
-=========================================
-SMART STUDY PLANNER - UTILITIES
-=========================================
+====================================================
+SMART STUDY PLANNER - UTILITY FUNCTIONS MODULE
+====================================================
 
-Features:
-- Toast notifications
-- Browser notifications
-- Notification permission handling
-- Password encoding utility
-- Reusable helper functions
+Purpose:
+Provides reusable helper functions used throughout the
+application, including toast messages, password encoding
+and browser notification permission handling.
 
 Author: Fernando Nathali
-=========================================
+=========================================================
 */
 
 "use strict";
 
-function showToast(message){
+// Displays a temporary toast notification to provide
+// feedback for user actions.
+function showToast(message) {
 
-const toast = document.createElement("div");
+    // Create a toast notification element.
+    const toast = document.createElement("div");
 
-toast.classList.add("toast");
+    toast.classList.add("toast");
 
-toast.textContent = message;
+    toast.textContent = message;
 
-document.body.appendChild(toast);
+    document.body.appendChild(toast);
 
-setTimeout(()=>{
-toast.remove();
-},3000);
+    // Automatically remove the notification
+    // after three seconds.
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
 
 }
 
-// SIMPLE PASSWORD ENCODING
-// NOTE:
-// This is for educational purposes only.
-// Real applications should use secure hashing.
+// =====================================================
+// PASSWORD ENCODING
+// =====================================================
+//
+// Note:
+// Base64 encoding is used solely for educational purposes
+// within this university project. Production applications
+// should use secure password hashing algorithms such as
+// bcrypt, Argon2 or PBKDF2.
 
-function hashPassword(password){
+// Encodes a user's password before storing it in
+// Local Storage.
+function hashPassword(password) {
     return btoa(password);
 }
 
-function requestNotificationPermission(){
+// Requests permission from the browser to allow
+// desktop notifications.
+function requestNotificationPermission() {
 
-if("Notification" in window){
+    // Verify that the browser supports notifications.
+    if ("Notification" in window) {
 
-if(Notification.permission !== "granted"){
-Notification.requestPermission();
-}
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
 
-}
+    }
 
 }

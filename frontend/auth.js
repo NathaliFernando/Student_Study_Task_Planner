@@ -1,93 +1,116 @@
-/*
-=========================================
-SMART STUDY PLANNER - AUTHENTICATION
-=========================================
+﻿/*
+====================================================
+SMART STUDY PLANNER - AUTHENTICATION MODULE
+====================================================
 
-Features:
-- User registration
-- User login/logout
-- Password encoding
-- Session persistence
-- User-specific task storage
+Description:
+Handles user authentication and session management
+for the Smart Study Planner application.
+
+Responsibilities:
+• User registration
+• Secure password storage
+• Login and logout
+• Session persistence using Local Storage
+• User-specific task loading and saving
+• Profile information updates
 
 Author: Fernando Nathali
-=========================================
+====================================================
 */
-
-// =========================
-// AUTHENTICATION SYSTEM
-// =========================
 
 "use strict";
 
+// -------------------------------------------------
+// Authentication state
+// -------------------------------------------------
+
+// Stores all registered users and their associated data.
 let users;
 
-try{
-users = JSON.parse(localStorage.getItem("users")) || {};
+try {
+    users = JSON.parse(localStorage.getItem("users")) || {};
 }
-catch{
-users = {};
+catch {
+    users = {};
 }
 
 let currentUser = localStorage.getItem("currentUser") || null;
 
 let loginAttempts = 0;
 
-// =========================
-// REGISTER USER
-// =========================
+/**
+ * Creates a new user account after validating
+ * the email address and password.
+ *
+ * A personal task list is also initialized for
+ * every new user.
+ */
+function registerUser() {
 
-function registerUser(){
-
-    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
 
-    if(!username || !password){
-        showToast("Enter username and password");
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)) {
+        showToast("Invalid email");
         return;
     }
 
-    if(users[username]){
+    if (!email || !password) {
+        showToast("Enter email and password");
+        return;
+    }
+
+    if (users[email]) {
         showToast("User already exists");
         return;
     }
 
-    users[username] = {
+    if (password.length < 6) {
+        showToast("Password must be at least 6 characters");
+        return;
+    }
+
+    users[email] = {
         password: hashPassword(password),
         tasks: []
     };
 
     localStorage.setItem("users", JSON.stringify(users));
 
-    currentUser = username;
-    localStorage.setItem("currentUser", username);
+    currentUser = email;
+    localStorage.setItem("currentUser", email);
 
     tasks = [];
 
     updateCurrentUserUI();
     refreshDashboard();
 
-    document.getElementById("username").value = "";
+    document.getElementById("email").value = "";
     document.getElementById("password").value = "";
 
-    showToast("Account created successfully 🎉");
+    showToast("Account created successfully ðŸŽ‰");
 }
 
-// =========================
-// LOGIN USER
-// =========================
+/**
+ * Authenticates an existing user.
+ *
+ * Successful authentication restores the user's
+ * saved tasks and redirects to the dashboard.
+ */
+function loginUser() {
 
-function loginUser(){
-
-    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
 
-    if(loginAttempts >= 3){
+    if (loginAttempts >= 3) {
         showToast("Too many failed attempts");
         return;
     }
 
-    if(!users[username]){
+    if (!users[email]) {
         loginAttempts++;
         showToast("User not found");
         return;
@@ -95,7 +118,7 @@ function loginUser(){
 
     const hashedPassword = hashPassword(password);
 
-    if(users[username].password !== hashedPassword){
+    if (users[email].password !== hashedPassword) {
         loginAttempts++;
         showToast("Incorrect password");
         return;
@@ -103,68 +126,69 @@ function loginUser(){
 
     loginAttempts = 0;
 
-    currentUser = username;
+    currentUser = email;
 
-    localStorage.setItem("currentUser", username);
+    localStorage.setItem("currentUser", email);
 
     loadUserTasks();
 
     updateCurrentUserUI();
 
-    document.getElementById("username").value = "";
+    document.getElementById("email").value = "";
     document.getElementById("password").value = "";
 
     showToast("Login successful ✅");
+
+    window.location.href = "dashboard.html";
+
 }
 
-// =========================
-// LOGOUT USER
-// =========================
+/**
+ * Logs the current user out of the application.
+ *
+ * User tasks are saved before the session is
+ * terminated.
+ */
+function logoutUser() {
 
-function logoutUser(){
-
-    if(!confirm("Logout from account?")){
+    if (!confirm("Logout from account?")) {
         return;
     }
 
-    currentUser = null;
+    saveTasks();              // Save the latest tasks
 
+    currentUser = null;
     tasks = [];
 
     localStorage.removeItem("currentUser");
 
-    updateCurrentUserUI();
+    window.location.replace("index.html");
 
-    refreshDashboard();
-
-    showToast("Logged out successfully");
 }
 
-// =========================
-// LOAD USER TASKS
-// =========================
+/**
+ * Loads all tasks belonging to the currently
+ * authenticated user.
+ */
+function loadUserTasks() {
 
-function loadUserTasks(){
-
-console.log("loadUserTasks running");
-
-    if(currentUser && users[currentUser]){
+    if (currentUser && users[currentUser]) {
         tasks = users[currentUser].tasks || [];
     }
-    else{
+    else {
         tasks = [];
     }
 
     refreshDashboard();
 }
 
-// =========================
-// SAVE TASKS
-// =========================
+/**
+ * Saves the current task list into the user's
+ * account stored in Local Storage.
+ */
+function saveTasks() {
 
-function saveTasks(){
-
-    if(currentUser && users[currentUser]){
+    if (currentUser && users[currentUser]) {
 
         users[currentUser].tasks = tasks;
 
@@ -175,14 +199,14 @@ function saveTasks(){
     }
 }
 
-// =========================
-// UPDATE UI
-// =========================
-
-function updateCurrentUserUI(){
-
-    const authSection =
-        document.getElementById("authSection");
+/**
+ * Updates the profile area with the current
+ * user's information.
+ *
+ * Only the part of the email before '@' is
+ * displayed as the profile name.
+ */
+function updateCurrentUserUI() {
 
     const profileSection =
         document.getElementById("profileSection");
@@ -193,67 +217,116 @@ function updateCurrentUserUI(){
     const currentUserDisplay =
         document.getElementById("currentUserDisplay");
 
-    if(currentUser){
+    if (profileSection) {
 
-        authSection.style.display = "none";
+        if (currentUser) {
 
-        profileSection.style.display = "block";
+            profileSection.style.display = "block";
 
-        profileName.textContent = currentUser;
+            // Show only the part before @
+            const displayName = currentUser.split("@")[0];
 
-        currentUserDisplay.textContent =
-            "Logged in as: " + currentUser;
+            if (profileName) {
+                profileName.textContent = displayName;
+            }
+
+            if (currentUserDisplay) {
+                currentUserDisplay.textContent =
+                    "Logged in as: " + currentUser;
+            }
+
+        }
+        else {
+
+            profileSection.style.display = "none";
+
+        }
+
     }
-    else{
 
-        authSection.style.display = "flex";
-
-        profileSection.style.display = "none";
-
-        currentUserDisplay.textContent = "";
-    }
 }
 
-// =========================
-// PROFILE MENU
-// =========================
-
-function toggleProfileMenu(){
+/**
+ * Opens or closes the profile dropdown menu.
+ */
+function toggleProfileMenu() {
 
     const menu = document.getElementById("profileMenu");
 
-    if(menu.style.display === "block"){
+    if (menu.style.display === "block") {
         menu.style.display = "none";
     }
-    else{
+    else {
         menu.style.display = "block";
     }
 }
 
 // Close menu when clicking outside
-document.addEventListener("click", function(event){
+document.addEventListener("click", function (event) {
 
     const menu = document.getElementById("profileMenu");
     const icon = document.querySelector(".profile-icon");
 
-    if(!menu || !icon){
+    if (!menu || !icon) {
         return;
     }
 
-    if(
+    if (
         !menu.contains(event.target) &&
         !icon.contains(event.target)
-    ){
+    ) {
         menu.style.display = "none";
     }
 });
 
-// =========================
-// AUTO LOGIN
-// =========================
+/**
+ * Restores the previous user session when the
+ * application starts.
+ */
+document.addEventListener("DOMContentLoaded", () => {
 
-if(currentUser){
-    loadUserTasks();
+    if (currentUser) {
+        loadUserTasks();
+    }
+
+    updateCurrentUserUI();
+
+});
+
+let inactivityTimer;
+
+// -------------------------------------------------
+// Automatic Session Timeout
+// -------------------------------------------------
+
+/**
+ * Automatically logs the user out after
+ * fifteen minutes of inactivity.
+ *
+ * This improves session security.
+ */
+function resetInactivityTimer() {
+
+    clearTimeout(inactivityTimer);
+
+    inactivityTimer = setTimeout(() => {
+
+        currentUser = null;
+        localStorage.removeItem("currentUser");
+        window.location.href = "index.html";
+
+    }, 15 * 60 * 1000);
+
 }
 
-updateCurrentUserUI();
+document.addEventListener(
+    "mousemove",
+    resetInactivityTimer
+);
+
+document.addEventListener(
+    "keypress",
+    resetInactivityTimer
+);
+
+resetInactivityTimer();

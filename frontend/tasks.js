@@ -1,298 +1,251 @@
-/*
-=========================================
-SMART STUDY PLANNER - TASK MANAGEMENT
-=========================================
+﻿/*
+====================================================
+SMART STUDY PLANNER - TASK MANAGEMENT MODULE
+====================================================
 
-Features:
-- Add tasks
-- Edit tasks
-- Delete tasks
-- Filter tasks
-- Search tasks
-- Import/export tasks
+Purpose:
+Manages all task-related operations including creating,
+displaying, filtering, searching, sorting, editing,
+deleting, importing and exporting study tasks.
 
 Author: Fernando Nathali
-=========================================
+=========================================================
 */
 
 "use strict";
 
-function renderTasks(){
+"use strict";
 
-console.log("renderTasks running");
-console.log(tasks);
+// Returns the list of tasks after applying the
+// selected filter, search keyword and sorting option.
+function getVisibleTasks() {
 
-if(!taskList) return;
+    // Create a copy of the task list to avoid
+    // modifying the original array.
+    let filteredTasks = [...tasks];
 
-taskList.innerHTML = "";
+    // Apply the selected task filter.
+    if (currentFilter === "COMPLETED") {
+        filteredTasks = filteredTasks.filter(task => task.completed);
+    } else if (currentFilter === "PENDING") {
+        filteredTasks = filteredTasks.filter(task => !task.completed);
+    } else if (["HIGH", "MEDIUM", "LOW"].includes(currentFilter)) {
+        filteredTasks = filteredTasks.filter(task => task.priority === currentFilter && !task.completed);
+    }
 
-let filteredTasks = [...tasks];
+    // Filter tasks using the search box.
+    const searchText = (searchInput?.value || "").toLowerCase();
+    filteredTasks = filteredTasks.filter(task => {
+        const title = String(task.title || "").toLowerCase();
+        const course = String(task.course || "").toLowerCase();
+        return title.includes(searchText) || course.includes(searchText);
+    });
 
-const searchText = (searchInput.value || "").toLowerCase();
+    // Sort tasks according to the selected option.
+    if (sortOption?.value === "earliest") {
+        filteredTasks.sort((a, b) => new Date(a.deadline || "9999-12-31") - new Date(b.deadline || "9999-12-31"));
+    } else if (sortOption?.value === "latest") {
+        filteredTasks.sort((a, b) => new Date(b.deadline || "0001-01-01") - new Date(a.deadline || "0001-01-01"));
+    }
 
-filteredTasks = filteredTasks.filter(task => {
-
-const title = String(task.title || "").toLowerCase();
-const course = String(task.course || "").toLowerCase();
-
-return (
-title.includes(searchText) ||
-course.includes(searchText)
-);
-
-});
-
-if(sortOption.value === "earliest"){
-
-filteredTasks.sort((a,b)=>
-new Date(a.deadline) - new Date(b.deadline)
-);
-
+    return filteredTasks;
 }
 
-if(sortOption.value === "latest"){
+// Displays all visible tasks as interactive
+// task cards in the task list.
+function renderTasks() {
+    if (!taskList) return;
 
-filteredTasks.sort((a,b)=>
-new Date(b.deadline) - new Date(a.deadline)
-);
+    taskList.innerHTML = "";
+    const filteredTasks = getVisibleTasks();
 
+    // Generate one task card for each task.
+    filteredTasks.forEach(task => {
+        const taskCard = document.createElement("div");
+        taskCard.classList.add("task-card", `${String(task.priority || "LOW").toLowerCase()}-priority`);
+
+        if (task.completed) {
+            taskCard.classList.add("completed-task");
+        }
+
+        taskCard.innerHTML = `
+            <h3>${task.title}</h3>
+            <p>Course: ${task.course}</p>
+            <p>Type: ${task.taskType}</p>
+            <p>Deadline: ${task.deadline || "No deadline"}</p>
+            <p>Study hours: ${task.studyHours || 0}</p>
+            <p>Priority: ${task.priority}</p>
+            <div class="task-actions">
+                <button class="complete-btn" type="button">${task.completed ? "Undo" : "Done"}</button>
+                <button class="delete-btn" type="button">Delete</button>
+                <button class="edit-btn" type="button">Edit</button>
+            </div>
+        `;
+
+        // Attach button event listeners.
+        taskCard.querySelector(".complete-btn").addEventListener("click", () => toggleTaskCompleted(task));
+        taskCard.querySelector(".delete-btn").addEventListener("click", () => deleteTask(task));
+        taskCard.querySelector(".edit-btn").addEventListener("click", () => editTask(tasks.indexOf(task)));
+
+        taskList.appendChild(taskCard);
+    });
+
+    // Display an empty state if no tasks match
+    // the selected filters.
+    if (filteredTasks.length === 0) {
+        taskList.innerHTML = `
+            <div class="empty-state">
+                <p>No tasks found</p>
+            </div>
+        `;
+    }
 }
 
-filteredTasks.forEach(task => {
-
-const taskCard = document.createElement("div");
-
-taskCard.classList.add("task-card");
-
-if(task.priority === "HIGH"){
-taskCard.classList.add("high-priority");
-}
-else if(task.priority === "MEDIUM"){
-taskCard.classList.add("medium-priority");
-}
-else{
-taskCard.classList.add("low-priority");
+// Marks a task as completed or restores it
+// back to pending.
+function toggleTaskCompleted(task) {
+    task.completed = !task.completed;
+    saveTasks();
+    refreshDashboard();
 }
 
-if(task.completed){
-taskCard.classList.add("completed-task");
-}
+// Removes the selected task from the Task List.
+function deleteTask(task) {
+    const index = tasks.indexOf(task);
 
-taskCard.innerHTML = `
-
-<h3>${task.title}</h3>
-
-<p>📚 ${task.course}</p>
-
-<p>📝 ${task.taskType}</p>
-
-<p>📅 ${task.deadline || "No deadline"}</p>
-
-<p>⏱ ${task.studyHours} hrs</p>
-
-<p>⭐ ${task.priority}</p>
-
-<div class="task-actions">
-
-<button class="complete-btn">✔</button>
-
-<button class="delete-btn">🗑</button>
-
-</div>
-
-`;
-
-const completeButton =
-taskCard.querySelector(".complete-btn");
-
-const deleteButton =
-taskCard.querySelector(".delete-btn");
-
-completeButton.addEventListener("click", function(){
-
-task.completed = !task.completed;
-
-saveTasks();
-
-refreshDashboard();
-
-});
-
-deleteButton.addEventListener("click", function(){
-
-const index = tasks.indexOf(task);
-
-if(index > -1){
-
-tasks.splice(index,1);
-
-saveTasks();
-
-refreshDashboard();
-
-}
-
-});
-
-taskList.appendChild(taskCard);
-
-});
-
-if(filteredTasks.length === 0){
-
-taskList.innerHTML = `
-<div class="empty-state">
-<p>No tasks found 🚀</p>
-</div>
-`;
-
-}
-
-}
-
-function importTasks(){
-
-const file = importFile.files[0];
-
-if(!file){
-    showToast("Please select a CSV file");
-    return;
-}
-
-const reader = new FileReader();
-
-reader.onload = function(event){
-
-    try{
-
-        const csv = event.target.result.trim();
-
-        const lines = csv.split(/\r?\n/);
-
-        lines.shift();
-
-        lines.forEach(line => {
-
-            if(!line.trim()) return;
-
-            // SUPPORT BOTH CSV + TAB FILES
-            let values;
-
-            if(line.includes("\t")){
-                values = line.split("\t");
-            }
-            else{
-                values = line.split(",");
-            }
-
-            if(values.length < 7){
-                throw new Error("Invalid CSV structure");
-            }
-
-            const title = String(values[0] || "").trim();
-            const course = String(values[1] || "").trim();
-            const taskType = String(values[2] || "").trim();
-            const deadline = String(values[3] || "").trim();
-            const studyHours = parseFloat(values[4]) || 0;
-            const priority = String(values[5] || "")
-                .trim()
-                .toUpperCase();
-
-            const completed =
-                String(values[6] || "")
-                .trim()
-                .toLowerCase() === "true";
-
-            if(!title || !course){
-                return;
-            }
-
-            const task = {
-
-                title,
-                course,
-                taskType,
-                deadline,
-                studyHours,
-                priority,
-                completed,
-                priorityScore: 0
-
-            };
-
-            if(typeof calculatePriority === "function"){
-
-                task.priorityScore =
-                    calculatePriority(
-                        task.taskType,
-                        task.deadline,
-                        task.studyHours
-                    ).score;
-
-            }
-
-            tasks.push(task);
-
-        });
-
+    if (index > -1) {
+        tasks.splice(index, 1);
         saveTasks();
-
         refreshDashboard();
-
-        showToast("Tasks imported successfully ✅");
-
     }
-    catch(error){
+}
 
-        console.error(error);
+// Open the Edit Task dialog and loads the
+// selected task information.
+function editTask(index) {
+    if (index < 0 || !tasks[index]) return;
 
-        showToast("Invalid CSV file");
+    currentEditIndex = index;
+    const task = tasks[index];
 
+    document.getElementById("editTitle").value = task.title || "";
+    document.getElementById("editCourse").value = task.course || "";
+    document.getElementById("editType").value = task.taskType || "Assignment";
+    document.getElementById("editDeadline").value = task.deadline || "";
+    document.getElementById("editHours").value = task.studyHours || "";
+    document.getElementById("editModal").style.display = "flex";
+}
+
+// Imports study tasks from a CSV file and
+// automatically recalculates task priorities.
+function importTasks() {
+    const file = importFile?.files[0];
+
+    if (!file) {
+        showToast("Please select a CSV file");
+        return;
     }
 
-};
+    // Read the selected CSV file.
+    const reader = new FileReader();
 
-reader.readAsText(file);
+    // Parse each CSV record into a task object.
+    reader.onload = event => {
+        try {
+            const csv = event.target.result.trim();
+            const lines = csv.split(/\r?\n/);
+            lines.shift();
 
+            lines.forEach(line => {
+                if (!line.trim()) return;
+
+                const values = line.includes("\t") ? line.split("\t") : line.split(",");
+
+                if (values.length < 7) {
+                    throw new Error("Invalid CSV structure");
+                }
+
+                const title = String(values[0] || "").trim();
+                const course = String(values[1] || "").trim();
+                const taskType = String(values[2] || "").trim() || "Assignment";
+                const deadline = String(values[3] || "").trim();
+                const studyHours = parseFloat(values[4]) || 0;
+                const completed = String(values[6] || "").trim().toLowerCase() === "true";
+
+                if (!title || !course) return;
+
+                const result = calculatePriority(taskType, deadline, studyHours);
+
+                // Create a new task from the imported data.
+                tasks.push({
+                    id: Date.now() + Math.floor(Math.random() * 1000),
+                    title,
+                    course,
+                    taskType,
+                    deadline,
+                    studyHours,
+                    taskTime: "",
+                    priority: result.priority,
+                    priorityScore: result.score,
+                    completed
+                });
+            });
+
+            saveTasks();
+            refreshDashboard();
+            showToast("Tasks imported successfully");
+        } catch (error) {
+            console.error(error);
+            showToast("Invalid CSV file");
+        }
+    };
+
+    reader.readAsText(file);
 }
 
-function exportTasks(){
-
-if(tasks.length === 0){
-alert("No tasks to export.");
-return;
+// Escapes special characters before exporting 
+// data to CSV format.
+function csvEscape(value) {
+    const text = String(value ?? "");
+    return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
-let csv = "Title,Course,Type,Deadline,StudyHours,Priority,Completed\n";
+// Exports all study tasks to a downloadable
+// CSV file.
+function exportTasks() {
+    if (tasks.length === 0) {
+        showModal("No tasks to export.");
+        return;
+    }
 
-tasks.forEach(task => {
+    // Create CSV header and data rows.
+    const header = "Title,Course,Type,Deadline,StudyHours,Priority,Completed";
+    const rows = tasks.map(task => [
+        task.title,
+        task.course,
+        task.taskType,
+        task.deadline,
+        task.studyHours,
+        task.priority,
+        task.completed
+    ].map(csvEscape).join(","));
 
-csv += `${task.title},${task.course},${task.taskType},${task.deadline},${task.studyHours},${task.priority},${task.completed}\n`;
+    // Generate and download the CSV file.
+    const blob = new Blob([[header, ...rows].join("\n")], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
 
-});
-
-const blob = new Blob([csv], { type: "text/csv" });
-
-const url = window.URL.createObjectURL(blob);
-
-const a = document.createElement("a");
-
-a.setAttribute("href", url);
-
-a.setAttribute("download", "tasks.csv");
-
-a.click();
-
+    a.href = url;
+    a.download = "tasks.csv";
+    a.click();
+    window.URL.revokeObjectURL(url);
 }
 
-function clearCompletedTasks(){
-
-tasks = tasks.filter(task => !task.completed);
-
-saveTasks();
-refreshDashboard();
-
-showToast("Completed tasks removed ✅");
-
+// Removes all completed tasks from the
+// application.
+function clearCompletedTasks() {
+    tasks = tasks.filter(task => !task.completed);
+    saveTasks();
+    refreshDashboard();
+    showToast("Completed tasks removed");
 }
-

@@ -1,384 +1,148 @@
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Student Study Task Planner</title>
+    <title>Student Study Task Planner</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
 
-<link rel="stylesheet" href="styles.css">
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
-<body>
+<body class="login-page">
 
-<!-- TOP NAVBAR -->
-<div class="navbar">
+<!-- =========================================
+     LOGIN PAGE LAYOUT
+========================================= -->
 
-<div class="app-brand">
-    <i class="fa-solid fa-graduation-cap"></i>
-    <div>
-        <h1>Smart Study Planner</h1>
-        <p id="appVersion"></p>
+    <div class="login-wrapper">
+
+        <!-- APPLICATION INTRODUCTION -->
+
+        <div class="login-left">
+
+            <!-- Application branding and feature overview -->
+
+            <div class="brand-content">
+
+                <h1>
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    Student Study Task Planner
+                </h1>
+
+                <p class="tagline">
+                    Organize your studies, manage assignments,
+                    track deadlines and stay productive.
+                </p>
+
+                <ul class="features">
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Task Management
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Study Scheduling
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Smart Prioritization
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Progress Analytics
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Calendar Integration
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+        <!-- USER AUTHENTICATION -->
+
+        <div class="login-right">
+
+            <!-- Login and registration form -->
+
+            <div class="login-card">
+
+                <h2>Welcome Back</h2>
+
+                <p class="login-subtitle">
+                    Sign in or create your student account
+                </p>
+
+                <input type="email" id="email" placeholder="Student Email">
+
+                <div class="password-wrapper">
+
+                    <input type="password" id="password" placeholder="Password">
+
+                    <i class="fa-solid fa-eye toggle-password" onclick="togglePassword('password')"></i>
+
+                </div>
+
+                <div class="password-wrapper">
+
+                    <input type="password" id="confirmPassword" placeholder="Confirm Password">
+
+                    <i class="fa-solid fa-eye toggle-password" onclick="togglePassword('confirmPassword')"></i>
+
+                </div>
+
+                <!-- Authentication buttons -->
+
+                <div class="login-buttons">
+
+                    <button class="register-btn" onclick="register()">
+                        Register
+                    </button>
+
+                    <button class="login-btn" onclick="login()">
+                        Login
+                    </button>
+
+                </div>
+
+                <p id="loginMessage"></p>
+
+            </div>
+
+        </div>
+
     </div>
-</div>
 
-<div class="dashboard-header">
+    <!-- Password visibility toggle -->
+    <script>
+        function togglePassword(id) {
 
-<p>
-Manage your academic workload efficiently.
-</p>
+            const field =
+                document.getElementById(id);
 
-</div>
+            field.type =
+                field.type === "password"
+                    ? "text"
+                    : "password";
 
-<div class="top-controls">
+        }
+    </script>
 
-<div class="auth-section" id="authSection">
-
-<input type="text" id="username" placeholder="Username">
-<input type="password" id="password" placeholder="Password">
-
-<button onclick="registerUser()">Register</button>
-<button onclick="loginUser()">Login</button>
-
-</div>
-
-<div class="profile-section" id="profileSection" style="display:none;">
-
-<div class="profile-icon" onclick="toggleProfileMenu()">
-    👤 <span id="profileName"></span>
-</div>
-
-<div class="profile-menu" id="profileMenu">
-
-<p id="profileNameDisplay"></p>
-<button onclick="logoutUser()">Logout</button>
-
-</div>
-
-</div>
-
-<button onclick="enableNotifications()">🔔</button>
-
-<p id="currentUserDisplay"></p>
-
-<button id="themeToggle">Toggle Dark Mode</button>
-
-</div>
-
-</div>
-
-<div class="layout">
-
-<!-- SIDEBAR -->
- <div class="sidebar" id="sidebar">
-
-<button id="menuToggle" class="menu-btn">☰</button>
-
-<ul>
-
-<li onclick="showSection('dashboard')">
-<i class="fa-solid fa-gauge"></i> <span>Dashboard</span>
-</li>
-
-<li onclick="showSection('tasks')">
-<i class="fa-solid fa-list"></i> <span>Tasks</span>
-</li>
-
-<li onclick="showSection('calendarTab')">
-<i class="fa-solid fa-calendar"></i> <span>Calendar</span>
-</li>
-
-<li onclick="showSection('analytics')">
-<i class="fa-solid fa-chart-bar"></i> <span>Analytics</span>
-</li>
-
-</ul>
-
-</div>
-
-<!-- MAIN CONTENT-->
-<div class="main-content">
-
-<!-- DASHBOARD -->
-<div id="dashboard" class="section">
-
-<section class="card">
-<h2>Dashboard Overview</h2>
-
-<div class="stats-grid">
-<div class="stat-box"><p>Total</p><h3 id="dashboardTotal">0</h3></div>
-<div class="stat-box"><p>Completed</p><h3 id="dashboardCompleted">0</h3></div>
-<div class="stat-box"><p>Pending</p><h3 id="dashboardPending">0</h3></div>
-<div class="stat-box"><p>Upcoming</p><h3 id="dashboardUpcoming">0</h3></div>
-</div>
-</section>
-
-<section class="card">
-<h2>Upcoming Tasks</h2>
-<ul id="upcomingTasks"></ul>
-</section>
-
-<section class="card">
-<h2>Deadline Warnings</h2>
-<div id="warnings"></div>
-</section>
-
-<section class="card">
-<h2>Smart Study Plan (Today)</h2>
-<div id="studyPlan"></div>
-</section>
-
-<section class="card">
-<h2>📅 Today's Study Timetable</h2>
-<div id="timetable"></div>
-</section>
-
-<section class="card">
-<h2>🔔 Smart Notifications</h2>
-<div id="notifications"></div>
-</section>
-
-<div class="insights-box">
-
-<h2>Smart Insights</h2>
-
-<div id="insights"></div>
-
-</div>
-
-<button onclick="enableNotifications()" class="primary-btn">
-Enable Notifications
-</button>
-
-<button onclick="disableNotifications()" class="primary-btn">
-Disable Notifications
-</button>
-
-</div>
-
-<!-- TASK -->
-<div id="tasks" class="section">
-
-<section class="card">
-<h2>Add Task</h2>
-
-<form id="taskForm" class="form-grid">
-<input type="text" id="title" placeholder="Task Title" required>
-<input type="text" id="course" placeholder="Course Name" required>
-
-<select id="taskType">
-<option>Assignment</option>
-<option>Exam</option>
-<option>Quiz</option>
-<option>Self Study</option>
-</select>
-
-<input type="date" id="deadline">
-<input type="number" id="studyHours" placeholder="Study Hours">
-
-<button type="submit" class="primary-btn">Add Task</button>
-</form>
-</section>
-
-<section class="card">
-<h2>Search</h2>
-<input type="text" id="searchInput">
-</section>
-
-<section class="card">
-<h2>Sort</h2>
-<select id="sortOption">
-<option value="none">No Sorting</option>
-<option value="earliest">Earliest</option>
-<option value="latest">Latest</option>
-</select>
-</section>
-
-<section class="card">
-<h2>Filters</h2>
-<div class="filters">
-
-<button class="filter-btn filter-all"
-onclick="setFilter('ALL')">
-All
-</button>
-
-<button class="filter-btn filter-high"
-onclick="setFilter('HIGH')">
-High
-</button>
-
-<button class="filter-btn filter-medium"
-onclick="setFilter('MEDIUM')">
-Medium
-</button>
-
-<button class="filter-btn filter-low"
-onclick="setFilter('LOW')">
-Low
-</button>
-
-<button class="filter-btn filter-completed"
-onclick="setFilter('COMPLETED')">
-Completed
-</button>
-
-</div>
-</section>
-
-<section class="card">
-<h2>Task List</h2>
-<div id="taskList" class="task-grid"></div>
-</section>
-
-</div>
-
-<!-- CALENDAR -->
-<div id="calendarTab" class="section">
-
-<section class="card">
-<h2>Calendar</h2>
-<div id="calendar"></div>
-</section>
-
-<section class="card">
-<h2>📅 Weekly Plan</h2>
-<div id="weeklyPlan"></div>
-</section>
-
-<section class="card">
-<h2>Import / Export</h2>
-<input type="file" id="importFile">
-<button id="importBtn" class="primary-btn">Import</button>
-<button id="exportBtn" class="primary-btn">Export</button>
-</section>
-
-</div>
-
-<!-- ANALYTICS -->
-<div id="analytics" class="section">
-
-<section class="card">
-<h2>Statistics</h2>
-<div class="stats-grid">
-<div class="stat-box"><p>Total</p><h3 id="totalTasks">0</h3></div>
-<div class="stat-box"><p>Completed</p><h3 id="completedTasks">0</h3></div>
-<div class="stat-box"><p>High Priority</p><h3 id="highPriorityTasks">0</h3></div>
-</div>
-</section>
-
-<section class="card">
-<h2>Progress</h2>
-<div id="progressContainer"><div id="progressBar"></div></div>
-<p id="progressText">0%</p>
-</section>
-
-<section class="card">
-<canvas id="taskChart"></canvas>
-</section>
-
-<section class="card">
-<canvas id="categoryChart"></canvas>
-</section>
-
-<section class="card">
-<canvas id="studyHoursChart"></canvas>
-</section>
-
-<section class="card">
-<canvas id="completionTrendChart"></canvas>
-</section>
-
-<section class="card">
-<h2>📊 Study Prediction</h2>
-<div id="prediction"></div>
-</section>
-
-</div>
-
-</div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-
-<script src="utils.js"></script>
-<script src="tasks.js"></script>
-<script src="dashboard.js"></script>
-<script src="analytics.js"></script>
-<script src="calendar.js"></script>
-<script src="notifications.js"></script>
-<script src="auth.js"></script>
-<script src="app.js"></script>
-
-<!-- =========================
-     EDIT TASK MODAL
-========================= -->
-
-<div id="editModal" class="modal">
-
-<div class="modal-content">
-
-<h2>Edit Task</h2>
-
-<input type="text" id="editTitle" placeholder="Task Title">
-
-<input type="text" id="editCourse" placeholder="Course">
-
-<input type="number" id="editHours" placeholder="Study Hours">
-
-<div class="modal-buttons">
-
-<button onclick="saveEditedTask()">
-Save
-</button>
-
-<button onclick="closeModal()" class="cancel-btn">
-Cancel
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="quick-actions">
-
-<button onclick="showSection('tasks')">
-➕ Add Task
-</button>
-
-<button onclick="clearCompletedTasks()">
-🗑 Clear Completed
-</button>
-
-<button onclick="exportTasks()">
-📤 Export
-</button>
-
-</div>
-
-<footer class="footer">
-    <p>Student Study Task Planner</p>
-    <p>Developed by Fernando Nathali © 2026</p>
-</footer>
-
-<div id="loader">
-
-<div class="spinner"></div>
-
-<p>Loading Smart Study Planner...</p>
-
-</div>
+    <!-- Login page functionality -->
+    <script src="login.js"></script>
 
 </body>
+
 </html>

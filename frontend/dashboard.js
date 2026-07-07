@@ -1,74 +1,94 @@
+/*
+====================================================
+SMART STUDY PLANNER - DASHBOARD MODULE
+====================================================
+
+Purpose:
+Controls the main dashboard by updating statistics,
+progress indicators, study timetable, notifications,
+calendar, analytics and other dashboard components.
+
+Author: Fernando Nathali
+=========================================================
+*/
+
 "use strict";
 
-function refreshDashboard(){
+// Refreshes every dashboard component after any change
+// (adding, editing, deleting or completing a task).
+function refreshDashboard() {
 
-renderTasks();
-updateStats();
-checkDeadlines();
-updateProgress();
-updateChart();
-updateCategoryChart();
-updateUpcomingTasks();
-updateStudyHoursChart();
-updateCompletionTrend();
-updateDashboardSummary();
-generateStudyPlan();
-generateTimetable();
-generateNotifications();
-generateWeeklyPlan();
-generatePrediction();
-renderCalendar();
-generateInsights();
-
-}
-
-function updateStats(){
-
-document.getElementById("totalTasks").textContent = tasks.length;
-document.getElementById("completedTasks").textContent =
-tasks.filter(t=>t.completed).length;
-document.getElementById("highPriorityTasks").textContent =
-tasks.filter(t=>t.priority==="HIGH").length;
+    renderTasks();
+    updateStats();
+    checkDeadlines();
+    updateProgress();
+    updateChart();
+    updateCategoryChart();
+    updateUpcomingTasks();
+    updateStudyHoursChart();
+    updateDashboardSummary();
+    generateTimetable();
+    generateNotifications();
+    generateWeeklyPlan();
+    generatePrediction();
+    renderCalendar();
+    generateInsights();
 
 }
 
-function updateProgress(){
+// Updates the dashboard statistics cards
+// (Total Tasks, Completed Tasks and High Priority Tasks).
+function updateStats() {
 
-const total = tasks.length;
-const completed = tasks.filter(t=>t.completed).length;
-
-let percent = total ? Math.round((completed/total)*100) : 0;
-
-document.getElementById("progressBar").style.width = percent+"%";
-document.getElementById("progressText").textContent = percent+"% Completed";
+    document.getElementById("totalTasks").textContent = tasks.length;
+    document.getElementById("completedTasks").textContent =
+        tasks.filter(t => t.completed).length;
+    document.getElementById("highPriorityTasks").textContent =
+        tasks.filter(t => t.priority === "HIGH").length;
 
 }
 
-function updateDashboardSummary(){
+// Calculates the overall study progress and updates
+// the visual progress bar.
+function updateProgress() {
 
-const total = tasks.length;
-const completed = tasks.filter(t => t.completed).length;
-const pending = total - completed;
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.completed).length;
 
-const today = new Date();
+    let percent = total ? Math.round((completed / total) * 100) : 0;
 
-const upcoming = tasks.filter(task => {
+    document.getElementById("progressBar").style.width = percent + "%";
+    document.getElementById("progressText").textContent = percent + "% Completed";
 
-if(!task.deadline || task.completed) return false;
+}
 
-const dueDate = new Date(task.deadline);
+// Calculates and displays a quick summary of
+// Total, Completed, Pending and Upcoming tasks.
+function updateDashboardSummary() {
 
-const difference = dueDate - today;
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.completed).length;
+    const pending = total - completed;
 
-const daysLeft = difference / (1000*60*60*24);
+    const today = new Date();
 
-return daysLeft >= 0 && daysLeft <= 7;
+    const upcoming = tasks.filter(task => {
 
-}).length;
+        if (!task.deadline || task.completed) return false;
 
-document.getElementById("dashboardTotal").textContent = total;
-document.getElementById("dashboardCompleted").textContent = completed;
-document.getElementById("dashboardPending").textContent = pending;
-document.getElementById("dashboardUpcoming").textContent = upcoming;
+        const dueDate = new Date(task.deadline);
+
+        const difference = dueDate - today;
+
+        const daysLeft = difference / (1000 * 60 * 60 * 24);
+
+        return daysLeft >= 0 && daysLeft <= 7;
+
+    }).length;
+
+    document.getElementById("dashboardTotal").textContent = total;
+    document.getElementById("dashboardCompleted").textContent = completed;
+    document.getElementById("dashboardPending").textContent = pending;
+    document.getElementById("dashboardUpcoming").textContent = upcoming;
 
 }
