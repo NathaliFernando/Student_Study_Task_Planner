@@ -17,7 +17,7 @@ https://nathalifernando.github.io/Student_Study_Task_Planner/
 ## 📷 Screenshots
 
 ### Login Page
-![Login](screenshots/login.png)
+<img width="1540" height="845" alt="image" src="https://github.com/user-attachments/assets/e3989027-5765-48bb-a358-cba2dc75913c" />
 
 ### Dashboard
 <img width="1895" height="1067" alt="Screenshot 2026-07-01 211852" src="https://github.com/user-attachments/assets/98847aa6-7b73-4c08-9dd6-f3e28f1bc630" />
