@@ -103,20 +103,71 @@ function renderTasks() {
 
 // Marks a task as completed or restores it
 // back to pending.
-function toggleTaskCompleted(task) {
-    task.completed = !task.completed;
-    saveTasks();
-    refreshDashboard();
+async function toggleTaskCompleted(task) {
+    const newStatus = task.completed ? "PENDING" : "COMPLETED";
+
+    const updatedTask = {
+        title: task.title,
+        course: task.course,
+        taskType: task.taskType,
+        deadline: task.deadline,
+        estimatedStudyHours: task.studyHours || 0,
+        priority: task.priority,
+        status: newStatus
+    };
+
+    try {
+        const response = await fetch(`http://localhost:8080/api/tasks/${task.id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedTask)
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to update task status");
+        }
+
+        const result = await response.json();
+
+        task.completed = result.status === "COMPLETED";
+
+        refreshDashboard();
+
+        console.log("Task status updated in backend:", result);
+
+    } catch (error) {
+        console.error("Could not update task status:", error);
+        showToast("Could not update task");
+    }
 }
 
 // Removes the selected task from the Task List.
-function deleteTask(task) {
-    const index = tasks.indexOf(task);
+async function deleteTask(task) {
+    try {
+        const response = await fetch(`http://localhost:8080/api/tasks/${task.id}`, {
+            method: "DELETE"
+        });
 
-    if (index > -1) {
-        tasks.splice(index, 1);
-        saveTasks();
+        if (!response.ok) {
+            throw new Error("Failed to delete task");
+        }
+
+        const index = tasks.indexOf(task);
+
+        if (index > -1) {
+            tasks.splice(index, 1);
+        }
+
         refreshDashboard();
+
+        console.log("Task deleted from backend:", task.id);
+        showToast("Task deleted successfully");
+
+    } catch (error) {
+        console.error("Could not delete task:", error);
+        showToast("Could not delete task");
     }
 }
 

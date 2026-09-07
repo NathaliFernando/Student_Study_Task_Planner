@@ -1,0 +1,41 @@
+BACKEND TESTING RECORD
+
+Test 1 – GET all tasks
+Endpoint: GET /api/tasks
+Expected: Returns all stored tasks
+Result: PASS
+
+Test 2 – GET existing task
+Endpoint: GET /api/tasks/{id}
+Expected: Returns the selected task
+Result: PASS
+
+Test 3 – GET nonexistent task
+Endpoint: GET /api/tasks/999
+Expected: HTTP 404
+Result: PASS
+
+Test 4 – POST task
+Endpoint: POST /api/tasks
+Expected: Creates a new task and returns generated task ID
+Result: PASS
+
+Test 5 – PUT task
+Endpoint: PUT /api/tasks/{id}
+Expected: Updates the selected task
+Result: PASS
+
+Test 6 – DELETE task
+Endpoint: DELETE /api/tasks/{id}
+Expected: Deletes the selected task
+Result: PASS
+
+Test 7 – Frontend POST
+Action: Add task through dashboard
+Expected: Task is sent to backend and stored in database
+Result: PASS
+
+Test 8 – Frontend DELETE
+Action: Delete task through dashboard
+Expected: Task is removed from backend database
+Result: PASS

@@ -1,0 +1,6 @@
+.DS_Store
+backend/target/
+backend/data/
+*.mv.db
+*.trace.db
+backend-startup-error.txt

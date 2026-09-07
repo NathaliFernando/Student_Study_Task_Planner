@@ -170,16 +170,41 @@ function logoutUser() {
  * Loads all tasks belonging to the currently
  * authenticated user.
  */
-function loadUserTasks() {
+async function loadUserTasks() {
+    try {
+        const response = await fetch("http://localhost:8080/api/tasks");
 
-    if (currentUser && users[currentUser]) {
-        tasks = users[currentUser].tasks || [];
-    }
-    else {
+        if (!response.ok) {
+            throw new Error("Failed to load tasks from backend");
+        }
+
+        const backendTasks = await response.json();
+
+        tasks = backendTasks.map(task => ({
+            id: task.taskId,
+            title: task.title,
+            course: task.course,
+            taskType: task.taskType,
+            deadline: task.deadline,
+            studyHours: task.estimatedStudyHours,
+            taskTime: "",
+            priority: task.priority,
+            priorityScore: 0,
+            completed: task.status === "COMPLETED"
+        }));
+
+        refreshDashboard();
+
+        console.log("Tasks loaded from backend:", tasks);
+
+    } catch (error) {
+        console.error("Could not load tasks from backend:", error);
+
         tasks = [];
-    }
+        refreshDashboard();
 
-    refreshDashboard();
+        showToast("Could not connect to backend");
+    }
 }
 
 /**
@@ -187,16 +212,7 @@ function loadUserTasks() {
  * account stored in Local Storage.
  */
 function saveTasks() {
-
-    if (currentUser && users[currentUser]) {
-
-        users[currentUser].tasks = tasks;
-
-        localStorage.setItem(
-            "users",
-            JSON.stringify(users)
-        );
-    }
+    console.log("Tasks are managed by the backend.");
 }
 
 /**

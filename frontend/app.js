@@ -30,7 +30,6 @@ Author: Fernando Nathali
 
 // Stores every study task of the currently logged-in user.
 let tasks = [];
-let tasks = [];
 let currentFilter = "ALL";
 let currentEditIndex = null;
 let taskChart = null;
@@ -127,7 +126,7 @@ function calculatePriority(taskType, deadline, studyHours) {
  * calculates its priority and refreshes every
  * dashboard component.
  */
-function addTask(event) {
+async function addTask(event) {
     event.preventDefault();
 
     const title = document.getElementById("title").value.trim();
@@ -136,24 +135,58 @@ function addTask(event) {
     const deadline = document.getElementById("deadline").value;
     const studyHours = document.getElementById("studyHours").value;
     const taskTime = document.getElementById("taskTime").value;
+
     const result = calculatePriority(taskType, deadline, studyHours);
 
-    tasks.push({
-        id: Date.now(),
-        title,
-        course,
-        taskType,
-        deadline,
-        studyHours,
-        taskTime,
+    const newTask = {
+        title: title,
+        course: course,
+        taskType: taskType,
+        deadline: deadline,
+        estimatedStudyHours: parseFloat(studyHours) || 0,
         priority: result.priority,
-        priorityScore: result.score,
-        completed: false
-    });
+        status: "PENDING"
+    };
 
-    saveTasks();
-    refreshDashboard();
-    form.reset();
+    try {
+        const response = await fetch("http://localhost:8080/api/tasks", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newTask)
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to create task");
+        }
+
+        const createdTask = await response.json();
+
+        console.log("Task created in backend:", createdTask);
+
+        tasks.push({
+            id: createdTask.taskId,
+            title: createdTask.title,
+            course: createdTask.course,
+            taskType: createdTask.taskType,
+            deadline: createdTask.deadline,
+            studyHours: createdTask.estimatedStudyHours,
+            taskTime: taskTime,
+            priority: createdTask.priority,
+            priorityScore: result.score,
+            completed: createdTask.status === "COMPLETED"
+        });
+
+        refreshDashboard();
+        form.reset();
+
+        showToast("Task added successfully ✅");
+
+    } catch (error) {
+        console.error("Could not save task:", error);
+        showToast("Could not connect to backend");
+    }
 }
 
 /**
@@ -165,7 +198,7 @@ function toggleTheme() {
 
     document.body.classList.toggle("dark-mode");
 
-    localStorage.setItem(
+    setItem(
         "theme",
         document.body.classList.contains("dark-mode")
             ? "dark"
@@ -429,24 +462,69 @@ function closeEditModal() {
  * Saves changes made to an existing task
  * and recalculates its priority.
  */
-function saveEditedTask() {
+async function saveEditedTask() {
     if (currentEditIndex === null || !tasks[currentEditIndex]) return;
 
     const task = tasks[currentEditIndex];
-    task.title = document.getElementById("editTitle").value.trim();
-    task.course = document.getElementById("editCourse").value.trim();
-    task.taskType = document.getElementById("editType").value;
-    task.deadline = document.getElementById("editDeadline").value;
-    task.studyHours = document.getElementById("editHours").value;
 
-    const result = calculatePriority(task.taskType, task.deadline, task.studyHours);
-    task.priority = result.priority;
-    task.priorityScore = result.score;
+    const updatedTask = {
+        title: document.getElementById("editTitle").value.trim(),
+        course: document.getElementById("editCourse").value.trim(),
+        taskType: document.getElementById("editType").value,
+        deadline: document.getElementById("editDeadline").value,
+        estimatedStudyHours: parseFloat(
+            document.getElementById("editHours").value
+        ) || 0,
+        priority: task.priority,
+        status: task.completed ? "COMPLETED" : "PENDING"
+    };
 
-    saveTasks();
-    refreshDashboard();
-    closeEditModal();
-    showToast("Task updated successfully");
+    try {
+        const response = await fetch(
+            `http://localhost:8080/api/tasks/${task.id}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(updatedTask)
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to update task");
+        }
+
+        const result = await response.json();
+
+        // Update the frontend task using the backend response
+        task.title = result.title;
+        task.course = result.course;
+        task.taskType = result.taskType;
+        task.deadline = result.deadline;
+        task.studyHours = result.estimatedStudyHours;
+        task.priority = result.priority;
+        task.completed = result.status === "COMPLETED";
+
+        const priorityResult = calculatePriority(
+            task.taskType,
+            task.deadline,
+            task.studyHours
+        );
+
+        task.priority = priorityResult.priority;
+        task.priorityScore = priorityResult.score;
+
+        refreshDashboard();
+        closeEditModal();
+
+        console.log("Task updated in backend:", result);
+        showToast("Task updated successfully");
+
+    } catch (error) {
+        console.error("Could not update task:", error);
+        showToast("Could not update task");
+    }
 }
 
 /**
@@ -521,20 +599,59 @@ document.addEventListener("click", event => {
 // -------------------------------------------------
 // Application Initialization
 // -------------------------------------------------
-document.addEventListener("DOMContentLoaded", () => {
-    if (typeof loadUserTasks === "function") {
-        loadUserTasks();
-    }
+document.addEventListener("DOMContentLoaded", async () => {
 
     if (typeof updateCurrentUserUI === "function") {
         updateCurrentUserUI();
     }
 
     const version = document.getElementById("appVersion");
+
     if (version) {
         version.textContent = "Version 1.0";
     }
 
     showSection("dashboard");
+
+    await loadTasksFromBackend();
+
     setTimeout(hideLoader, 800);
+
 });
+
+// -------------------------------------------------
+// Load tasks from Spring Boot backend
+// -------------------------------------------------
+async function loadTasksFromBackend() {
+
+    try {
+
+        const backendTasks = await getTasksFromBackend();
+
+        tasks = backendTasks.map(task => ({
+
+            id: task.taskId,
+            title: task.title,
+            course: task.course,
+            taskType: task.taskType,
+            deadline: task.deadline,
+            studyHours: task.estimatedStudyHours,
+            taskTime: "",
+            priority: task.priority,
+            priorityScore: 0,
+            completed: task.status === "COMPLETED"
+
+        }));
+
+        console.log("Tasks loaded from backend:", tasks);
+
+        refreshDashboard();
+
+    } catch (error) {
+
+        console.error("Could not load tasks from backend:", error);
+
+        showToast("Could not load tasks from backend");
+
+    }
+}

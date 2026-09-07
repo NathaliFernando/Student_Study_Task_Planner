@@ -1,7 +1,10 @@
 # 🎓 Student Study Task Planner
 
-A responsive web-based study management application developed using **HTML, CSS, and JavaScript** to help students organize their academic workload efficiently.
+## Project Overview
 
+The Student Study Task Planner is a responsive web application designed to help students organise and manage their academic study tasks.
+
+Users can create, view, edit and delete study tasks and monitor their workload through dashboard statistics, progress indicators, charts, filtering, calendar functionality and study planning features.
 The application enables users to manage assignments, exams, quizzes, and study sessions while providing smart scheduling, analytics, deadline tracking, and productivity insights.
 
 ---
@@ -31,6 +34,25 @@ https://nathalifernando.github.io/Student_Study_Task_Planner/
 ---
 
 ## ✨ Features
+
+## Main Features
+
+* Create study tasks
+* View study tasks
+* Edit study tasks
+* Delete study tasks
+* Task priority calculation
+* Task status management
+* Deadline management
+* Study-hour estimation
+* Dashboard statistics
+* Progress tracking
+* Charts and analytics
+* Calendar view
+* Search and filtering
+* Responsive desktop, tablet and mobile layouts
+* Dark mode
+* CSV import/export
 
 ### 👤 User Authentication
 - User registration
@@ -77,38 +99,124 @@ https://nathalifernando.github.io/Student_Study_Task_Planner/
 
 ---
 
-## 🛠 Technologies Used
+## Technologies
 
-- HTML5
-- CSS3
-- JavaScript (ES6)
-- Local Storage API
-- Chart.js
-- FullCalendar.js
-- Font Awesome
-- Git
-- GitHub
+### Frontend
+
+* HTML5
+* CSS3
+* JavaScript
+* Chart.js
+* FullCalendar
+* Font Awesome
+
+### Backend
+
+* Java
+* Spring Boot
+* Spring Data JPA
+* Hibernate
+* H2 Database
+* Maven
+
+---
+
+## Backend API
+
+The application provides a REST API for task management.
+
+### Get all tasks
+
+GET `/api/tasks`
+
+### Get one task
+
+GET `/api/tasks/{id}`
+
+### Create a task
+
+POST `/api/tasks`
+
+### Update a task
+
+PUT `/api/tasks/{id}`
+
+### Delete a task
+
+DELETE `/api/tasks/{id}`
+
+## Running the Backend
+
+Make sure Java and Maven are installed.
+
+From the project root directory, run:
+
+```bash
+mvn -f backend/pom.xml spring-boot:run
+```
+
+The Spring Boot application runs on:
+
+`http://localhost:8080`
+
+The task API is available at:
+
+`http://localhost:8080/api/tasks`
+
+## Running the Frontend
+
+Open the `frontend` folder using Visual Studio Code and start the application using Live Server.
+
+Open the frontend through the local Live Server URL, for example:
+
+`http://127.0.0.1:5500/frontend/`
+
+The frontend communicates with the Spring Boot backend through the REST API.
+
+## Database
+
+The project uses an H2 file-based database for persistent task storage.
+
+The database files are stored in the backend data directory.
+
+## Testing
+
+The REST API was tested using curl commands.
+
+Tested operations include:
+
+* Creating tasks
+* Retrieving all tasks
+* Retrieving individual tasks
+* Updating tasks
+* Deleting tasks
+* Verifying persistence
+* Testing a nonexistent task and receiving HTTP 404
 
 ---
 
 ## 📂 Project Structure
 
-```text
-Student_Study_Task_Planner
+Student_Study_Task_Planner/
 │
-├── dashboard.html
-├── index.html
-├── styles.css
+├── backend/
+│   ├── src/
+│   ├── data/
+│   ├── pom.xml
+│   └── ...
 │
-├── app.js
-├── analytics.js
-├── auth.js
-├── calendar.js
-├── dashboard.js
-├── login.js
-├── notifications.js
-├── tasks.js
-├── utils.js
+├── frontend/
+│   ├── index.html
+│   ├── dashboard.html
+│   ├── app.js
+│   ├── auth.js
+│   ├── login.js
+│   ├── dashboard.js
+│   ├── tasks.js
+│   ├── styles.css
+│   └── ...
+│
+├── screenshots/
 │
 └── README.md
 ```
@@ -143,15 +251,12 @@ git clone https://github.com/nathalifernando/Student_Study_Task_Planner.git
 
 ---
 
-## 🎯 Key Functionalities
 
-- Smart priority calculation based on deadline, task type, and study hours
-- Automatic study timetable generation
-- Weekly planning view
-- Progress visualization using interactive charts
-- Study workload prediction
-- Responsive interface for different screen sizes
-- User-specific task management
+## Development Process
+
+The project was developed iteratively. The initial frontend concept was refined during implementation, followed by the development of a Java Spring Boot backend and persistent database storage.
+
+Testing and debugging were performed throughout development using browser developer tools, Live Server, Maven and curl.
 
 ---
 
