@@ -225,19 +225,61 @@ Student_Study_Task_Planner/
 
 ## ▶️ How to Run the Project
 
-1. Clone the repository
+### Prerequisites
 
-```bash
-git clone https://github.com/nathalifernando/Student_Study_Task_Planner.git
-```
+Make sure the following are installed:
 
-2. Open the project folder.
+- Java JDK
+- Maven
+- Visual Studio Code
+- A modern web browser
+- Live Server extension for Visual Studio Code
 
-3. Open **index.html** in any modern web browser.
+### 1. Start the backend
 
-4. Register a new account and begin managing your study tasks.
+Open Terminal 1 and navigate to the project folder:
 
----
+cd ~/Documents/"Java & Web Development"/Student_Study_Task_Planner
+
+Start the Spring Boot backend:
+
+mvn -f backend/pom.xml spring-boot:run
+
+Keep this terminal running while using the application.
+
+The backend runs on:
+
+http://localhost:8080
+
+The REST API is available at:
+
+http://localhost:8080/api/tasks
+
+### 2. Start the frontend
+
+Open the project folder in Visual Studio Code.
+
+Open the `frontend` folder and launch `index.html` using the Live Server extension.
+
+The frontend will normally open at:
+
+http://127.0.0.1:5500/frontend/
+
+### 3. Use the application
+
+Register a new account or log in.
+
+The application communicates with the Spring Boot backend for task management.
+
+Tasks are stored in the H2 file-based database and therefore persist across page refreshes and Spring Boot restarts.
+
+### Important
+
+The Spring Boot backend must remain running while using the application.
+
+If the backend is stopped, the frontend cannot load, create, update or delete tasks because the REST API is unavailable.
+
+--
 
 ## 📸 Application Modules
 
@@ -250,7 +292,6 @@ git clone https://github.com/nathalifernando/Student_Study_Task_Planner.git
 - Dark Mode
 
 ---
-
 
 ## Development Process
 

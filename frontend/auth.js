@@ -100,7 +100,7 @@ function registerUser() {
  * Successful authentication restores the user's
  * saved tasks and redirects to the dashboard.
  */
-function loginUser() {
+async function loginUser() {
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
@@ -130,7 +130,7 @@ function loginUser() {
 
     localStorage.setItem("currentUser", email);
 
-    loadUserTasks();
+    await loadUserTasks();
 
     updateCurrentUserUI();
 
@@ -198,12 +198,8 @@ async function loadUserTasks() {
         console.log("Tasks loaded from backend:", tasks);
 
     } catch (error) {
-        console.error("Could not load tasks from backend:", error);
-
-        tasks = [];
-        refreshDashboard();
-
-        showToast("Could not connect to backend");
+    console.error("Could not load tasks from backend:", error);
+    showToast("Could not connect to backend");
     }
 }
 
