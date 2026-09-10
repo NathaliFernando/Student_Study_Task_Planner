@@ -9,11 +9,13 @@ The application enables users to manage assignments, exams, quizzes, and study s
 
 ---
 
-## 🚀 Live Demo
+## Live Demo
 
-View the live application:
+The frontend interface is available through GitHub Pages:
 
-https://nathalifernando.github.io/Student_Study_Task_Planner/
+https://github.com/NathaliFernando/Student_Study_Task_Planner.git
+
+The full application requires the Spring Boot backend to be run locally. Follow the installation and run instructions below.
 
 ---
 
@@ -33,7 +35,7 @@ https://nathalifernando.github.io/Student_Study_Task_Planner/
 
 ---
 
-## ✨ Features
+## Features
 
 ## Main Features
 
@@ -54,13 +56,12 @@ https://nathalifernando.github.io/Student_Study_Task_Planner/
 * Dark mode
 * CSV import/export
 
-### 👤 User Authentication
+### User Authentication
 - User registration
 - User login and logout
-- User-specific task storage
 - Session persistence
 
-### 📚 Task Management
+### Task Management
 - Add study tasks
 - Edit existing tasks
 - Delete tasks
@@ -70,14 +71,14 @@ https://nathalifernando.github.io/Student_Study_Task_Planner/
 - Sort by deadline
 - Filter by priority and completion status
 
-### 📅 Planning & Scheduling
+### Planning & Scheduling
 - Interactive calendar
 - Weekly study plan
 - Daily study timetable
 - Upcoming tasks section
 - Deadline warnings
 
-### 📊 Analytics Dashboard
+### Analytics Dashboard
 - Study progress chart
 - Task category chart
 - Study hours per course chart
@@ -85,17 +86,17 @@ https://nathalifernando.github.io/Student_Study_Task_Planner/
 - Smart insights
 - Study workload prediction
 
-### 🔔 Smart Features
+### Smart Features
 - Browser notifications
 - Deadline reminders
 - Smart notifications panel
 - Dark mode
 - Responsive user interface
 
-### 📁 Data Management
+### Data Management
 - Import tasks from CSV
 - Export tasks to CSV
-- Local Storage persistence
+- Persistent task storage using H2 database
 
 ---
 
@@ -119,79 +120,72 @@ https://nathalifernando.github.io/Student_Study_Task_Planner/
 * H2 Database
 * Maven
 
+## Data Storage
+
+Task data is stored by the Spring Boot backend in the H2 file-based database using Spring Data JPA and Hibernate.
+
+Browser LocalStorage is used for frontend-related information such as the current user session, theme preferences and notification information.
+
+This means task data is handled by the backend/database, while selected frontend and session information remains browser-based.
+
+---
+
+## Task Data Model
+
+Each task is represented by the following fields:
+
+`title` - Name of the academic task
+`course` - Course associated with the task
+`taskType` - Type of task, such as assignment, exam, quiz or self-study
+`deadline` - Due date of the task
+`estimatedStudyHours` - Estimated study time required
+`priority` - Priority level calculated from task information
+`status` - Current task status, such as pending or completed
+
+The `Task` entity is managed by the Spring Boot backend using Spring Data JPA and Hibernate and is persisted in the H2 database.
+
 ---
 
 ## Backend API
 
 The application provides a REST API for task management.
 
-### Get all tasks
+The REST API is exposed by the Spring Boot backend at:
 
-GET `/api/tasks`
+http://localhost:8080/api/tasks
 
-### Get one task
+Get all tasks - GET `/api/tasks` - Retrieve all tasks 
 
-GET `/api/tasks/{id}`
+Get one task - GET `/api/tasks/{id}` - Retrieve one task
 
-### Create a task
+Create a task - POST `/api/tasks` - Create a task
 
-POST `/api/tasks`
+Update a task - PUT `/api/tasks/{id}` - Update a task
 
-### Update a task
-
-PUT `/api/tasks/{id}`
-
-### Delete a task
-
-DELETE `/api/tasks/{id}`
-
-## Running the Backend
-
-Make sure Java and Maven are installed.
-
-From the project root directory, run:
-
-```bash
-mvn -f backend/pom.xml spring-boot:run
-```
-
-The Spring Boot application runs on:
-
-`http://localhost:8080`
-
-The task API is available at:
-
-`http://localhost:8080/api/tasks`
-
-## Running the Frontend
-
-Open the `frontend` folder using Visual Studio Code and start the application using Live Server.
-
-Open the frontend through the local Live Server URL, for example:
-
-`http://127.0.0.1:5500/frontend/`
-
-The frontend communicates with the Spring Boot backend through the REST API.
+Delete a task - DELETE `/api/tasks/{id}` - Delete a task
 
 ## Database
 
 The project uses an H2 file-based database for persistent task storage.
 
-The database files are stored in the backend data directory.
+Task data is persisted by the Spring Boot backend using Spring Data JPA and Hibernate. This allows tasks to remain available after page refreshes and Spring Boot restarts.
 
 ## Testing
 
-The REST API was tested using curl commands.
+Testing was performed during development using the web application and direct REST API requests with `curl`.
 
-Tested operations include:
+The following areas were tested:
 
-* Creating tasks
-* Retrieving all tasks
-* Retrieving individual tasks
-* Updating tasks
-* Deleting tasks
-* Verifying persistence
-* Testing a nonexistent task and receiving HTTP 404
+- Task creation
+- Task retrieval
+- Task updating
+- Task deletion
+- Invalid task ID handling
+- Database persistence
+- Frontend-to-backend communication
+- Task loading from the backend
+- Responsive layouts
+- Dashboard analytics
 
 ---
 
@@ -199,26 +193,41 @@ Tested operations include:
 
 Student_Study_Task_Planner/
 │
+├── README.md
+│
 ├── backend/
-│   ├── src/
-│   ├── data/
 │   ├── pom.xml
-│   └── ...
+│   └── src/
+│       └── main/
+│           ├── java/
+│           │   └── com/
+│           │       └── studentplanner/
+│           │           ├── config/
+│           │           │   └── StudentStudyTaskPlannerApplication.java
+│           │           │
+│           │           └── task/
+│           │               ├── Task.java
+│           │               ├── TaskController.java
+│           │               ├── TaskRepository.java
+│           │               └── TaskService.java
+│           │
+│           └── resources/
+│               └── application.properties
 │
-├── frontend/
-│   ├── index.html
-│   ├── dashboard.html
-│   ├── app.js
-│   ├── auth.js
-│   ├── login.js
-│   ├── dashboard.js
-│   ├── tasks.js
-│   ├── styles.css
-│   └── ...
-│
-├── screenshots/
-│
-└── README.md
+└── frontend/
+    ├── analytics.js
+    ├── api.js
+    ├── app.js
+    ├── auth.js
+    ├── calendar.js
+    ├── dashboard.html
+    ├── dashboard.js
+    ├── index.html
+    ├── login.js
+    ├── notifications.js
+    ├── styles.css
+    ├── tasks.js
+    └── utils.js
 
 ---
 
@@ -226,23 +235,24 @@ Student_Study_Task_Planner/
 
 ### Prerequisites
 
-Make sure the following are installed:
+The following are required:
 
-- Java JDK
-- Maven
-- Visual Studio Code
+- Java JDK 21 or later
+- Apache Maven
 - A modern web browser
-- Live Server extension for Visual Studio Code
+- Visual Studio Code or another code editor
+- A local web server for serving the frontend (for example, VS Code Live Server)
 
 ### 1. Start the backend
 
-Open Terminal 1 and navigate to the project folder:
+Open a terminal and navigate to the project folder:
 
-cd ~/Documents/"Java & Web Development"/Student_Study_Task_Planner
+git clone https://github.com/NathaliFernando/Student_Study_Task_Planner.git
+cd Student_Study_Task_Planner
 
 Start the Spring Boot backend:
 
-mvn -f backend/pom.xml spring-boot:run
+```mvn -f backend/pom.xml spring-boot:run```
 
 Keep this terminal running while using the application.
 
@@ -250,7 +260,7 @@ The backend runs on:
 
 http://localhost:8080
 
-The REST API is available at:
+The task REST API is available at:
 
 http://localhost:8080/api/tasks
 
@@ -260,15 +270,17 @@ Open the project folder in Visual Studio Code.
 
 Open the `frontend` folder and launch `index.html` using the Live Server extension.
 
-The frontend will normally open at:
+The application will normally open at:
 
-http://127.0.0.1:5500/frontend/
+http://127.0.0.1:5500/frontend/index.html
+
+The application starts at the login/registration page. After successful login, the user is redirected to the dashboard.
 
 ### 3. Use the application
 
 Register a new account or log in.
 
-The application communicates with the Spring Boot backend for task management.
+The application's frontend communicates with the Spring Boot backend through the REST API for task management.
 
 Tasks are stored in the H2 file-based database and therefore persist across page refreshes and Spring Boot restarts.
 
@@ -276,9 +288,38 @@ Tasks are stored in the H2 file-based database and therefore persist across page
 
 The Spring Boot backend must remain running while using the application.
 
-If the backend is stopped, the frontend cannot load, create, update or delete tasks because the REST API is unavailable.
+If the backend is stopped, the frontend cannot load, create, update, or delete tasks because the REST API is unavailable.
 
 --
+
+## Troubleshooting
+
+### Backend does not start
+
+Check that Java 21 and Maven are installed:
+
+```bash
+java -version
+mvn -version
+```
+The backend must be running before using task-management functionality.
+
+### Frontend cannot load tasks
+
+Make sure the Spring Boot backend is running on:
+http://localhost:8080
+
+Then reload the frontend.
+
+### Port 8080 is already in use
+
+Stop the application currently using port 8080 and restart the Spring Boot backend.
+
+### Frontend opens incorrectly
+
+Make sure the frontend is being served through a local web server such as Live Server rather than opening the HTML files directly with a file:// URL.
+
+---
 
 ## 📸 Application Modules
 
