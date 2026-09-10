@@ -13,25 +13,40 @@ The application enables users to manage assignments, exams, quizzes, and study s
 
 The frontend interface is available through GitHub Pages:
 
-https://github.com/NathaliFernando/Student_Study_Task_Planner.git
+https://github.com/NathaliFernando/Student_Study_Task_Planner
 
 The full application requires the Spring Boot backend to be run locally. Follow the installation and run instructions below.
 
 ---
 
-## 📷 Screenshots
+## Screenshots
 
-### Login Page
-<img width="1540" height="845" alt="image" src="https://github.com/user-attachments/assets/e3989027-5765-48bb-a358-cba2dc75913c" />
+### Login & Registration
+
+![Login page](screenshots/login.png)
 
 ### Dashboard
-<img width="1895" height="1067" alt="Screenshot 2026-07-01 211852" src="https://github.com/user-attachments/assets/98847aa6-7b73-4c08-9dd6-f3e28f1bc630" />
+
+![Dashboard](screenshots/dashboard.png)
+
+### Task Management
+
+![Task management](screenshots/tasks.png)
 
 ### Calendar
-<img width="936" height="767" alt="Screenshot 2026-07-01 212714" src="https://github.com/user-attachments/assets/f5a14e7a-5ad5-4cf5-9eb8-e91947e2a551" />
+
+![Calendar](screenshots/calendar.png)
 
 ### Analytics
-<img width="937" height="721" alt="Screenshot 2026-07-01 212616" src="https://github.com/user-attachments/assets/2273ee1f-a048-42c4-bc88-8a4c8d264542" />
+
+![Analytics](screenshots/analytics.png)
+
+### Responsive Mobile View
+
+![Mobile view](screenshots/mobile.png)
+
+---
+
 
 ---
 
