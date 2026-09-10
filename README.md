@@ -219,7 +219,6 @@ Student_Study_Task_Planner/
 ├── screenshots/
 │
 └── README.md
-```
 
 ---
 
